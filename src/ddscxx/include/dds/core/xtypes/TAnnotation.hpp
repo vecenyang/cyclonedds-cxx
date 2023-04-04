@@ -19,6 +19,7 @@
 #define OMG_DDS_CORE_XTYPES_TANNOTATIONS_HPP_
 
 #include <dds/core/Reference.hpp>
+#include <dds/core/xtypes/TypeKind.hpp>
 
 namespace dds
 {
@@ -29,7 +30,7 @@ namespace xtypes
 
 struct AnnotationKind_def
 {
-    enum type
+    enum Type
     {
         ID_ANNOTATION_TYPE,
         OPTIONAL_ANNOTATION_TYPE,
@@ -47,7 +48,7 @@ typedef dds::core::safe_enum<AnnotationKind_def> AnnotationKind;
 
 struct ExtensibilityKind_def
 {
-    enum type
+    enum Type
     {
         FINAL,
         EXTENSIBLE,
@@ -95,14 +96,16 @@ template <typename DELEGATE>
 class dds::core::xtypes::TAnnotation : public dds::core::Reference<DELEGATE>
 {
 public:
-    OMG_DDS_REF_TYPE(TAnnotation, dds::core::Reference, DELEGATE)
+    OMG_DDS_REF_TYPE_NO_DC(TAnnotation, dds::core::Reference, DELEGATE)
 
 public:
     TAnnotation();
+#if defined (OMG_DDS_X_TYPES_DYNAMIC_TYPE_SUPPORT)
 protected:
     TAnnotation(const TypeKind& kind);
 public:
     TypeKind kind() const;
+#endif
 };
 template <typename DELEGATE>
 class dds::core::xtypes::TIdAnnotation : public dds::core::xtypes::TAnnotation<DELEGATE>

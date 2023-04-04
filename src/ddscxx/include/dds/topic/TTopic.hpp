@@ -22,6 +22,7 @@
 #include <dds/core/conformance.hpp>
 #include <dds/core/types.hpp>
 #include <dds/core/ref_traits.hpp>
+#include <dds/core/xtypes/DynamicType.hpp>
 #include <dds/domain/DomainParticipant.hpp>
 #include <dds/topic/qos/TopicQos.hpp>
 #include <dds/topic/TopicDescription.hpp>
@@ -298,7 +299,7 @@ public:
           dds::topic::TopicListener<T>* listener = NULL,
           const dds::core::status::StatusMask& mask = dds::core::status::StatusMask::none());
 
-    #if defined (OMG_DDS_X_TYPE_DYNAMIC_TYPES_SUPPORT)
+    #if defined (OMG_DDS_X_TYPES_DYNAMIC_TYPE_SUPPORT)
     /**
      * Create a new topic with a dynamic type description. Notice that in this
      * case the data type has to be DynamicData, so the Topic type will be
@@ -339,12 +340,12 @@ public:
      */
     Topic(const dds::domain::DomainParticipant& dp,
           const std::string& topic_name,
-          const dds::core::xtypes::DynamicType type
+          const dds::core::xtypes::DynamicType type,
           const dds::topic::qos::TopicQos& qos,
           dds::topic::TopicListener<T>* listener = NULL,
           const dds::core::status::StatusMask& mask = dds::core::status::StatusMask::none());
 
-    #endif /* OMG_DDS_X_TYPE_DYNAMIC_TYPES_SUPPORT */
+    #endif /* OMG_DDS_X_TYPES_DYNAMIC_TYPE_SUPPORT */
 
 public:
     /**

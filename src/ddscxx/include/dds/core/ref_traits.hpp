@@ -40,7 +40,7 @@ template <typename T>
 struct smart_ptr_traits;
 
 template <typename TO, typename FROM>
-TO  polymorphic_cast(FROM& from);
+TO  polymorphic_cast(const FROM& from);
 
 /** @endcond */
 

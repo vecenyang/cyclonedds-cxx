@@ -38,7 +38,7 @@ struct dds::core::smart_ptr_traits
 };
 
 template <typename TO, typename FROM>
-TO dds::core::polymorphic_cast(FROM& from)
+TO dds::core::polymorphic_cast(const FROM& from)
 {
     typename TO::DELEGATE_REF_T dr =
         ::std::dynamic_pointer_cast< typename TO::DELEGATE_T>(from.delegate());

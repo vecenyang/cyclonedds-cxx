@@ -13,7 +13,7 @@
 #define OMG_DDS_CORE_XTYPES_DETAIL_TDYNAMICDATA_HPP_
 
 namespace dds {
-  namespace code {
+  namespace core {
     namespace xtypes {
       namespace detail {
         class DynamicData;

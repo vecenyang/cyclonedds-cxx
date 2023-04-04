@@ -57,19 +57,19 @@ template <typename DELEGATE>
 class dds::core::xtypes::TDynamicData : dds::core::Reference<DELEGATE>
 {
 public:
-    OMG_DDS_REF_TYPE(TDynamicData, dds::core::Reference, DELEGATE)
+    OMG_DDS_REF_TYPE_PROTECTED_DC(TDynamicData, dds::core::Reference, DELEGATE)
 public:
     TDynamicData(const DynamicType& type);
 
 public:
     template <typename T>
-    void value(uint32_T mid, const T& v) const;
+    void value(uint32_t mid, const T& v) const;
 
     template <typename T>
     T value(const std::string& mid, const T& v) const;
 
     template <typename T>
-    T value(uint32_T mid) const;
+    T value(uint32_t mid) const;
 
     template <typename T>
     T value(const std::string& mid) const;

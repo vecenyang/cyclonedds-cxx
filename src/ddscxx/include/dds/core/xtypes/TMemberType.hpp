@@ -64,7 +64,7 @@ template <typename DELEGATE>
 class dds::core::xtypes::TMemberType : public dds::core::Reference<DELEGATE>
 {
 public:
-    OMG_DDS_REF_TYPE(TMemberType, dds::core::Reference, DELEGATE)
+    OMG_DDS_REF_TYPE_PROTECTED_DC(TMemberType, dds::core::Reference, DELEGATE)
 
 public:
     TMemberType(const std::string& name, const dds::core::xtypes::DynamicType& type);

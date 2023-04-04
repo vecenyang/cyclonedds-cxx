@@ -1,5 +1,5 @@
-#ifndef OMG_DDS_XTYPE_
-#define OMG_DDS_TYPE_OBJECT_HPP_
+#ifndef OMG_DDS_CORE_XTYPES_TYPEKIND_HPP_
+#define OMG_DDS_CORE_XTYPES_TYPEKIND_HPP_
 
 /* Copyright 2010, Object Management Group, Inc.
  * Copyright 2010, PrismTech, Corp.
@@ -25,7 +25,7 @@
 
 
 
-#if defined(OMG_DDS_X_TYPES_DYNANIC_TYPE_SUPPORT)
+#if defined(OMG_DDS_X_TYPES_DYNAMIC_TYPE_SUPPORT)
 
 
 // --- Shared meta-data: -------------------------------------------------
@@ -38,7 +38,7 @@ namespace xtypes
 {
 struct TypeKind_def
 {
-    enum type
+    enum Type
     {
         NO_TYPE           =  0, // sentinel indicating "null" value
         PRIMITIVE_TYPE    = 0x4000,
@@ -82,7 +82,7 @@ typedef dds::core::safe_enum<TypeKind_def> TypeKind;
 }
 }
 
-#endif  // OMG_DDS_X_TYPES_DYNANIC_TYPE_SUPPORT
+#endif  // OMG_DDS_X_TYPES_DYNAMIC_TYPE_SUPPORT
 
 
-#endif // !defined(OMG_DDS_TYPE_OBJECT_HPP_)
+#endif // !defined(OMG_DDS_CORE_XTYPES_TYPEKIND_HPP_)

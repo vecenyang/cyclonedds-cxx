@@ -33,9 +33,11 @@ class TPrimitiveType;
 template <typename T>
 struct dynamic_type_traits
 {
-    static const TypeKind TYPE_ID = TypeKind::NO_TYPE;
+    static const TypeKind TYPE_ID;
     static const std::string NAME;
 };
+template <typename T>
+const TypeKind dynamic_type_traits<T>::TYPE_ID = TypeKind::NO_TYPE;
 
 /**
  * Primitive type constructor. This function can be used
@@ -53,14 +55,14 @@ template <typename T>
 class dds::core::xtypes::TPrimitiveType : public dds::core::xtypes::DynamicType
 {
 public:
-    TPrimitiveType() : DynamicType(dynamic_type_traits<T>::TYPE_ID, dynamic_type_traits<T>::NAME) { }
+    TPrimitiveType() : DynamicType(dynamic_type_traits<T>::NAME, dynamic_type_traits<T>::TYPE_ID) { }
 };
 
 template <typename T>
 dds::core::xtypes::TPrimitiveType<T>
 dds::core::xtypes::PrimitiveType()
 {
-    static dds::core::xtypes::TPrimitiveType<T> t();
+    static dds::core::xtypes::TPrimitiveType<T> t;
     return t;
 }
 

@@ -25,7 +25,7 @@
 #include <dds/core/Reference.hpp>
 #include <dds/core/xtypes/Annotations.hpp>
 
-#if defined (OMG_DDS_X_TYPES_DYNANIC_TYPE_SUPPORT)
+#if defined (OMG_DDS_X_TYPES_DYNAMIC_TYPE_SUPPORT)
 
 namespace dds
 {
@@ -59,7 +59,7 @@ template <typename DELEGATE>
 class dds::core::xtypes::TDynamicType : public dds::core::Reference<DELEGATE>
 {
 public:
-    OMG_DDS_REF_TYPE(TDynamicType, dds::core::Reference, DELEGATE)
+    OMG_DDS_REF_TYPE_PROTECTED_DC(TDynamicType, dds::core::Reference, DELEGATE)
 
 protected:
     TDynamicType(const std::string& name, TypeKind kind);
@@ -67,7 +67,8 @@ protected:
     TDynamicType(const std::string& name, TypeKind kind, const std::vector<Annotation>& annotations);
     template <typename FWI>
     TDynamicType(const std::string& name, TypeKind kind, const FWI& annotation_begin, const FWI& annotation_end);
-    TDynamicType(const DyamicType& other);
+public:
+    TDynamicType(const TDynamicType& other);
     ~TDynamicType();
 public:
     /**
@@ -83,7 +84,7 @@ public:
     const std::vector<Annotation>& annotations() const;
 
 public:
-    bool operator == (const DynamicType& that) const;
+    bool operator == (const TDynamicType& that) const;
 
 };
 
@@ -91,4 +92,4 @@ public:
 #endif  // defined(OMG_DDS_EXTENSIBLE_AND_DYNAMIC_TOPIC_TYPE_SUPPORT)
 
 
-#endif // !defined(OMG_DDS_CORE_XTYPES_T_DYNAMIC_TYPE_HPP_)
+#endif // !defined(OMG_DDS_X_TYPES_DYNAMIC_TYPE_SUPPORT)

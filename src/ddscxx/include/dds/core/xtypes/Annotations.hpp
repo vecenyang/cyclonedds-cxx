@@ -56,7 +56,7 @@ dds::core::xtypes::IdAnnotation Id(uint32_t);
 dds::core::xtypes::KeyAnnotation Key();
 dds::core::xtypes::SharedAnnotation Shared();
 dds::core::xtypes::NestedAnnotation Nested();
-dds::core::xtypes::ExtensibilityAnnotation Extensibility(dds::core::xtypes::ExtensibilityAnnotation::ExtensibilityKind kind);
+dds::core::xtypes::ExtensibilityAnnotation Extensibility(dds::core::xtypes::ExtensibilityKind kind);
 dds::core::xtypes::ExtensibilityAnnotation Final();
 dds::core::xtypes::ExtensibilityAnnotation Extensible();
 dds::core::xtypes::ExtensibilityAnnotation Mutable();

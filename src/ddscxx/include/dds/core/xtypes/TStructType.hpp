@@ -53,7 +53,7 @@ bool isNested(const TStructType<T>& s);
  * Declares a forward declaration for a struct type.
  */
 template <typename DELEGATE>
-class dds::core::xtypes::TStructForwardDeclaration : public dds::core::xtypes::DynamicType<DELEGATE>
+class dds::core::xtypes::TStructForwardDeclaration : public dds::core::xtypes::DynamicType
 {
 public:
     TStructForwardDeclaration(const std::string& name);
@@ -65,7 +65,7 @@ public:
  * members vector.
  */
 template <typename DELEGATE>
-class dds::core::xtypes::TStructType : public dds::core::xtypes::DynamicType<DELEGATE>
+class dds::core::xtypes::TStructType : public dds::core::xtypes::DynamicType
 {
 public:
 
@@ -99,10 +99,10 @@ public:
     TStructType(
         const std::string& name,
         const TStructType& parent,
-        const MemberIter& begin,
-        const MemberIter& end,
-        const AnnotationIter& begin,
-        const AnnotationIter& end);
+        const MemberIter& mBegin,
+        const MemberIter& mEnd,
+        const AnnotationIter& aBegin,
+        const AnnotationIter& aEnd);
 public:
     TStructType parent() const;
     const std::vector<MemberType>& members() const;
