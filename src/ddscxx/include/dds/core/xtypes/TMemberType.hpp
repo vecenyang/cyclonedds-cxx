@@ -67,32 +67,61 @@ public:
     OMG_DDS_REF_TYPE_PROTECTED_DC(TMemberType, dds::core::Reference, DELEGATE)
 
 public:
-    TMemberType(const std::string& name, const dds::core::xtypes::DynamicType& type);
+    TMemberType(const std::string& name, const dds::core::xtypes::DynamicType& type)
+    {
+        this->delegate()->name(name);
+        this->delegate()->dt(type);
+    }
 
     TMemberType(const std::string& name,
                 const dds::core::xtypes::DynamicType& type,
-                const Annotation& annotation
-               );
+                const Annotation& annotation)
+    {
+        this->delegate()->name(name);
+        this->delegate()->dt(type);
+        this->delegate()->annotation(annotation);
+    }
 
     template <typename AnnotationIter>
     TMemberType(const std::string& name,
                 const dds::core::xtypes::DynamicType& type,
                 const AnnotationIter& begin,
-                const AnnotationIter& end);
+                const AnnotationIter& end)
+    {
+        this->delegate()->name(name);
+        this->delegate()->dt(type);
+        this->delegate()->annotations(begin, end);
+    }
 
 
     TMemberType(const std::string& name,
                 const dds::core::xtypes::DynamicType& type,
-                const std::vector<Annotation>& annotations
-               );
+                const std::vector<Annotation>& annotations)
+    {
+        this->delegate()->name(name);
+        this->delegate()->dt(type);
+        this->delegate()->annotations(annotations);
+    }
 
 public:
-    const std::string& name() const;
-    const dds::core::xtypes::DynamicType& type() const;
+    const std::string& name() const
+    {
+        return this->delegate()->name;
+    }
+    const dds::core::xtypes::DynamicType& type() const
+    {
+        return this->delegate()->type();
+    }
 
 public:
-    TMemberType add_annotation(const Annotation& annotation);
-    TMemberType remove_annotation(const Annotation& annotation);
+    TMemberType add_annotation(const Annotation& annotation)
+    {
+        return this->delegate()->annotation(annotation);
+    }
+    TMemberType remove_annotation(const Annotation& annotation)
+    {
+        return this->delegate()->remove_annotation(annotation);
+    }
 };
 
 #endif /* OMG_DDS_CORE_XTYPES_TMEMBER_TYPE_HPP */
