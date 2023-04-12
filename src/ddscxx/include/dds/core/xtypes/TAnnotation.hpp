@@ -99,21 +99,24 @@ public:
     OMG_DDS_REF_TYPE_NO_DC(TAnnotation, dds::core::Reference, DELEGATE)
 
 public:
-    TAnnotation();
+    TAnnotation() { }
+    template<typename Q, template <typename> class K>
+    operator K<Q>&() { return reinterpret_cast<K<Q>&>(*this); }
 #if defined (OMG_DDS_X_TYPES_DYNAMIC_TYPE_SUPPORT)
 protected:
-    TAnnotation(const TypeKind& kind);
+    TAnnotation(const dds::core::xtypes::TypeKind& kind) { }
 public:
-    TypeKind kind() const;
+    dds::core::xtypes::TypeKind kind() const { return this->delegate()->kind(); }
 #endif
+    const AnnotationKind& akind() const { return this->delegate()->akind(); }
 };
 template <typename DELEGATE>
 class dds::core::xtypes::TIdAnnotation : public dds::core::xtypes::TAnnotation<DELEGATE>
 {
 public:
-    TIdAnnotation(uint32_t id);
+    TIdAnnotation(uint32_t id) { this->delegate()->id(id); }
 public:
-    uint32_t id() const;
+    uint32_t id() const { return this->delegate()->id(); }
 };
 template <typename DELEGATE>
 class dds::core::xtypes::TKeyAnnotation : public dds::core::xtypes::TAnnotation<DELEGATE>
