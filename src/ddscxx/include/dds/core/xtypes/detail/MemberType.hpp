@@ -12,10 +12,7 @@
 #ifndef OMG_DDS_CORE_XTYPES_DETAIL_TMEMBER_TYPE_HPP
 #define OMG_DDS_CORE_XTYPES_DETAIL_TMEMBER_TYPE_HPP
 
-#include <dds/core/xtypes/Annotations.hpp>
 #include <dds/core/xtypes/DynamicType.hpp>
-
-#include <algorithm>
 
 namespace dds {
 namespace core {
@@ -25,18 +22,8 @@ class MemberType
 {
   public:
     MemberType(const std::string& name, xtypes::DynamicType& dt)
-        : name_(name)
-        , dt_(dt)
-        , ann_()
+        : name_(name), dt_(dt), is_optional_(false), is_key_(false), id_(-1)
     {
-    }
-
-    MemberType(const std::string& name, xtypes::DynamicType& dt, xtypes::Annotation& a)
-        : name_(name)
-        , dt_(dt)
-        , ann_()
-    {
-        ann_.push_back(a);
     }
 
     void name(const std::string& name)
@@ -49,146 +36,61 @@ class MemberType
         dt_ = dt;
     }
 
-    void annotations(std::vector<xtypes::Annotation>& ann)
-    {
-        ann_.reserve(ann.size() + ann_.size());
-        for (auto it = ann.begin(); it != ann.end(); ++it)
-        {
-            ann_.emplace_back(*it);
-        }
-    }
-
-    template<typename AnnoIter>
-    void annotations(AnnoIter begin, AnnoIter end)
-    {
-        ann_.reserve(ann_.size() + ( end - begin) );
-        for (auto it = begin; it != end; ++it)
-        {
-            ann_.emplace_back(*it);
-        }
-    }
-
-    void annotation(xtypes::Annotation& ann)
-    {
-        ann_.push_back(ann);
-    }
-
-    const std::string& name() const noexcept
+    const std::string& name()
     {
         return name_;
     }
 
-    const xtypes::DynamicType& dynamic_type() const noexcept
+    const xtypes::DynamicType& dynamic_type()
     {
         return dt_;
     }
 
-    const std::vector<xtypes::Annotation>& annotations()
+    MemberType& optional(bool value)
     {
-        return ann_;
-    }
-
-    void remove_annotation(const xtypes::Annotation& a)
-    {
-        auto rem = std::find_if(
-            ann_.begin(),
-            ann_.end(),
-            [&]( xtypes::Annotation& b)
-            {
-                return b.akind() == a.akind();
-            }
-        );
-        if ( rem != ann_.end() )
-        {
-            ann_.erase(rem);
-        }
-    }
-
-    bool annotation_iterator(AnnotationKind& annotation_kind, xtypes::Annotation& retAnn)
-    {
-        auto retVal = std::find_if(
-            ann_.begin(),
-            ann_.end(),
-            [&]( xtypes::Annotation& a)
-            {
-                return (a.akind() == annotation_kind);
-            }
-        );
-
-        if (retVal == ann_.end())
-        {
-            return false;
-        }
-        retAnn = *retVal;
-        return true;
-    }
-
-    bool find_annotation(AnnotationKind& annotation_kind)
-    {
-        return ann_.end() !=  std::find_if(
-            ann_.begin(),
-            ann_.end(),
-            [&]( xtypes::Annotation& a)
-            {
-                return (a.akind() == annotation_kind);
-            }
-        );
+        this->is_optional_ = value;
+        return *this;
     }
 
     bool is_optional()
     {
-        AnnotationKind a = AnnotationKind_def::Type::OPTIONAL_ANNOTATION_TYPE;
-        return find_annotation(a);
+        return is_optional_;
     }
 
-    bool is_shared()
+    MemberType& key(bool value)
     {
-        AnnotationKind a = AnnotationKind_def::Type::SHARED_ANNOTATION_TYPE;
-        return find_annotation(a);
+        this->is_key_ = value;
+        return *this;
     }
 
     bool is_key()
     {
-        AnnotationKind a = AnnotationKind_def::Type::KEY_ANNOTATION_TYPE;
-        return find_annotation(a);
+        return is_key_;
     }
 
-    bool is_must_understand()
+    MemberType& id(int32_t value)
     {
-        AnnotationKind a = AnnotationKind_def::Type::MUST_UNDERSTAND_ANNOTATION_TYPE;
-        return find_annotation(a);
-    }
-
-    bool is_bitset()
-    {
-        AnnotationKind a = AnnotationKind_def::Type::BITSET_ANNOTATION_TYPE;
-        return find_annotation(a);
+        this->id_ = value;
+        return *this;
     }
 
     bool has_id()
     {
-        AnnotationKind a = AnnotationKind_def::Type::ID_ANNOTATION_TYPE;
-        return find_annotation(a);
+        return id_ == -1;
     }
 
     uint32_t get_id()
     {
-        AnnotationKind a = AnnotationKind_def::Type::ID_ANNOTATION_TYPE;
-
-        // creating a generic IdAnnotation that will be filled by annotation_iterator()
-        xtypes::IdAnnotation ida(0);
-        if (not annotation_iterator(a, ida))
-        {
-            throw IllegalOperationError("No Id Annotation found");
-        }
-        return ida->id();
+        return id_;
     }
 
   private:
 
     std::string name_;
     xtypes::DynamicType dt_;
-    std::vector<xtypes::Annotation> ann_;
+    bool is_optional_;
+    bool is_key_;
+    uint32_t id_;
 };
 }
 }

@@ -26,7 +26,7 @@ namespace dds {
             {
             }
 
-            StructType(const std::string& name, const StructType& parent, const std::vector<MemberType>& members)
+            StructType(const std::string& name, const StructType& parent, const std::vector<xtypes::MemberType>& members)
               : xtypes::DynamicType(name, xtypes::TypeKind::STRUCTURE_TYPE), parent_(&parent), members_(members)
             {
             }
@@ -44,11 +44,11 @@ namespace dds {
             bool has_parent() const { return this->parent_ == nullptr; }
             void parent(const StructType& parent) { this->parent_ = &parent; }
             const StructType& parent() const { return *(this->parent_); }
-            void add_member(const MemberType& member) { this->members_.emplace_back(member); }
+            void add_member(const xtypes::MemberType& member) { this->members_.emplace_back(member); }
 
           private:
             const StructType* parent_;
-            std::vector<MemberType> members_;
+            std::vector<xtypes::MemberType> members_;
         };
 
         bool isFinal(const StructType& s) { return false; }
