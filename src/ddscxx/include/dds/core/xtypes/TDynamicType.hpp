@@ -19,11 +19,9 @@
  * limitations under the License.
  */
 
-#include <string>
-#include <vector>
 #include <dds/core/conformance.hpp>
 #include <dds/core/Reference.hpp>
-#include <dds/core/xtypes/Annotations.hpp>
+#include <dds/core/xtypes/TypeKind.hpp>
 
 #if defined (OMG_DDS_X_TYPES_DYNAMIC_TYPE_SUPPORT)
 
@@ -58,33 +56,31 @@ bool isAggregationType(const TDynamicType<T>& t);
 template <typename DELEGATE>
 class dds::core::xtypes::TDynamicType : public dds::core::Reference<DELEGATE>
 {
-public:
     OMG_DDS_REF_TYPE_PROTECTED_DC(TDynamicType, dds::core::Reference, DELEGATE)
 
 protected:
-    TDynamicType(const std::string& name, TypeKind kind);
-    TDynamicType(const std::string& name, TypeKind kind, const Annotation& annotation);
-    TDynamicType(const std::string& name, TypeKind kind, const std::vector<Annotation>& annotations);
-    template <typename FWI>
-    TDynamicType(const std::string& name, TypeKind kind, const FWI& annotation_begin, const FWI& annotation_end);
+    TDynamicType(const std::string& name, TypeKind kind)
+    {
+        this->delegate()->name(name);
+        this->delegate()->kind(kind);
+    }
+
 public:
-    TDynamicType(const TDynamicType& other);
-    ~TDynamicType();
-public:
+    TDynamicType(const TDynamicType& other)
+    {
+        this->delegate()->name(other.name());
+        this->delegate()->kind(other.kind());
+    }
+    ~TDynamicType() {};
     /**
      * Get the type kind.
      */
-    TypeKind kind() const;
+    TypeKind kind() const { return this->delegate()->kind(); }
 
     /**
      * Get the type name.
      */
-    const std::string& name() const;
-
-    const std::vector<Annotation>& annotations() const;
-
-public:
-    bool operator == (const TDynamicType& that) const;
+    const std::string& name() const { return this->delegate()->name(); }
 
 };
 
