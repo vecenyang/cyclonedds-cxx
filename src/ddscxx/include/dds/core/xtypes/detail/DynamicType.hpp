@@ -21,7 +21,7 @@ namespace dds {
       namespace detail {
         class DynamicType {
           public:
-            DynamicType() : kind_(dds::core::xtypes::TypeKind::NO_TYPE) {}
+            DynamicType() : kind_(xtypes::TypeKind::NO_TYPE) {}
 
             void name(const std::string& name)
             {
@@ -38,7 +38,7 @@ namespace dds {
               this->kind_ = kind;
             }
 
-            const dds::core::xtypes::TypeKind& kind() const
+            const xtypes::TypeKind& kind() const
             {
               return kind_;
             }
