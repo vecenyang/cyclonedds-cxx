@@ -51,13 +51,13 @@ namespace dds {
             std::vector<xtypes::MemberType> members_;
         };
 
-        bool isFinal(const StructType& s) { return false; }
+        // bool isFinal(const StructType& s) { return false; }
 
-        bool isExtensible(const StructType& s) { return false; }
+        // bool isExtensible(const StructType& s) { return false; }
 
-        bool isMutable(const StructType& s) { return false; }
+        // bool isMutable(const StructType& s) { return false; }
 
-        bool isNested(const StructType& s) { return false; }
+        // bool isNested(const StructType& s) { return false; }
       }
     }
   }
