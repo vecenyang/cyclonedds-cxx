@@ -18,6 +18,7 @@ set(sources
     src/dds/core/Time.cpp
     src/dds/core/policy/CorePolicy.cpp
     src/dds/core/status/State.cpp
+    src/dds/core/xtypes/PrimitiveTypes.cpp
     src/dds/domain/discovery.cpp
     src/dds/domain/find.cpp
     src/dds/pub/pubdiscovery.cpp
