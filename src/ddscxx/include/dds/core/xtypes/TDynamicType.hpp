@@ -56,8 +56,8 @@ bool isAggregationType(const TDynamicType<T>& t);
 template <typename DELEGATE>
 class dds::core::xtypes::TDynamicType : public dds::core::Reference<DELEGATE>
 {
-    OMG_DDS_REF_TYPE_PROTECTED_DC(TDynamicType, dds::core::Reference, DELEGATE)
-
+    OMG_DDS_REF_TYPE_NO_DC(TDynamicType, dds::core::Reference, DELEGATE)
+    OMG_DDS_COMPLETE_RULE_OF_FIVE_VIRTUAL_DEFAULT(TDynamicType)
 protected:
     TDynamicType(const std::string& name, TypeKind kind)
     {
@@ -66,12 +66,6 @@ protected:
     }
 
 public:
-    TDynamicType(const TDynamicType& other)
-    {
-        this->delegate()->name(other.name());
-        this->delegate()->kind(other.kind());
-    }
-    ~TDynamicType() {};
     /**
      * Get the type kind.
      */
