@@ -32,4 +32,9 @@
 
 #include <dds/core/detail/ddscore.hpp>
 
+#include <dds/core/xtypes/DynamicType.hpp>
+#include <dds/core/xtypes/MemberType.hpp>
+#include <dds/core/xtypes/PrimitiveTypes.hpp>
+#include <dds/core/xtypes/StructType.hpp>
+
 #endif /* OMG_DDS_CORE_PACKAGE_INCLUDE_HPP_ */
