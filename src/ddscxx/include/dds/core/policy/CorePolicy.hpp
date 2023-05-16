@@ -1,23 +1,22 @@
 #ifndef OMG_DDS_CORE_POLICY_CORE_POLICY_HPP_
 #define OMG_DDS_CORE_POLICY_CORE_POLICY_HPP_
 
-/* Copyright 2010, Object Management Group, Inc.
- * Copyright 2010, PrismTech, Corp.
- * Copyright 2010, Real-Time Innovations, Inc.
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2010, Object Management Group, Inc.
+// Copyright 2010, PrismTech, Corp.
+// Copyright 2010, Real-Time Innovations, Inc.
+// All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include <dds/core/policy/PolicyKind.hpp>
 #include <dds/core/policy/detail/CorePolicy.hpp>
@@ -152,6 +151,9 @@ UserData;
 typedef dds::core::policy::detail::WriterDataLifecycle
 WriterDataLifecycle;
 
+typedef dds::core::policy::detail::WriterBatching
+WriterBatching;
+
 #ifdef  OMG_DDS_PERSISTENCE_SUPPORT
 typedef ::dds::core::policy::detail::DurabilityService
 DurabilityService;
@@ -192,6 +194,7 @@ OMG_DDS_POLICY_TRAITS(DurabilityService,    22)
 OMG_DDS_POLICY_TRAITS(DataRepresentation,   23)
 OMG_DDS_POLICY_TRAITS(TypeConsistencyEnforcement, 24)
 #endif  // OMG_DDS_EXTENSIBLE_AND_DYNAMIC_TOPIC_TYPE_SUPPORT
+OMG_DDS_POLICY_TRAITS(WriterBatching,       25)
 
 }
 }

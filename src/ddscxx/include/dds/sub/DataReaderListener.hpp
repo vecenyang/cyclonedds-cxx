@@ -1,23 +1,22 @@
 #ifndef OMG_DDS_SUB_DATA_READER_LISTENER_HPP_
 #define OMG_DDS_SUB_DATA_READER_LISTENER_HPP_
 
-/* Copyright 2010, Object Management Group, Inc.
- * Copyright 2010, PrismTech, Corp.
- * Copyright 2010, Real-Time Innovations, Inc.
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2010, Object Management Group, Inc.
+// Copyright 2010, PrismTech, Corp.
+// Copyright 2010, Real-Time Innovations, Inc.
+// All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include <dds/core/status/Status.hpp>
 
@@ -33,97 +32,95 @@ class NoOpDataReaderListener;
 }
 }
 
-/**
- * @brief
- * DataReader events Listener
- *
- * Since a DataReader is an Entity, it has the ability to have a Listener
- * associated with it. In this case, the associated Listener should be of type
- * DataReaderListener. This interface must be implemented by the
- * application. A user-defined class must be provided by the application which must
- * extend from the DataReaderListener class.
- *
- * <b><i>
- * All operations for this interface must be implemented in the user-defined class, it is
- * up to the application whether an operation is empty or contains some functionality.
- * </i></b>
- *
- * The DataReaderListener provides a generic mechanism (actually a
- * callback function) for the Data Distribution Service to notify the application of
- * relevant asynchronous status change events, such as a missed deadline, violation of
- * a QosPolicy setting, etc. The DataReaderListener is related to
- * changes in communication status StatusConditions.
- *
- * @code{.cpp}
- * // Application example listener
- * class ExampleListener :
- *                public virtual dds::sub::DataReaderListener<Foo::Bar>
- * {
- * public:
- *     virtual void on_requested_deadline_missed (
- *         dds::sub::DataReader<Foo::Bar>& reader,
- *         const dds::core::status::RequestedDeadlineMissedStatus & status)
- *     {
- *         std::cout << "on_requested_deadline_missed" << std::endl;
- *     }
- *
- *     virtual void on_requested_incompatible_qos (
- *         dds::sub::DataReader<Foo::Bar>& reader,
- *         const dds::core::status::RequestedIncompatibleQosStatus & status)
- *     {
- *         std::cout << "on_requested_incompatible_qos" << std::endl;
- *     }
- *
- *     virtual void on_sample_rejected (
- *         dds::sub::DataReader<Foo::Bar>& reader,
- *         const dds::core::status::SampleRejectedStatus & status)
- *     {
- *         std::cout << "on_sample_rejected" << std::endl;
- *     }
- *
- *     virtual void on_liveliness_changed (
- *         dds::sub::DataReader<Foo::Bar>& reader,
- *         const dds::core::status::LivelinessChangedStatus & status)
- *     {
- *         std::cout << "on_liveliness_changed" << std::endl;
- *     }
- *
- *     virtual void on_data_available (
- *         dds::sub::DataReader<Foo::Bar>& reader)
- *     {
- *         std::cout << "on_data_available" << std::endl;
- *     }
- *
- *     virtual void on_subscription_matched (
- *         dds::sub::DataReader<Foo::Bar>& reader,
- *         const dds::core::status::SubscriptionMatchedStatus & status)
- *     {
- *         std::cout << "on_subscription_matched" << std::endl;
- *     }
- *
- *     virtual void on_sample_lost (
- *         dds::sub::DataReader<Foo::Bar>& reader,
- *         const dds::core::status::SampleLostStatus & status)
- *     {
- *         std::cout << "on_sample_lost" << std::endl;
- *     }
- * };
- *
- * // Create DataReader with the listener
- * dds::domain::DomainParticipant participant(org::eclipse::cyclonedds::domain::default_id());
- * dds::topic::Topic<Foo::Bar> topic(participant, "TopicName");
- * dds::sub::Subscriber subscriber(participant);
- * dds::sub::DataReader<Foo::Bar> reader(subscriber,
- *                                       topic,
- *                                       subscriber.default_datareader_qos(),
- *                                       new ExampleListener(),
- *                                       dds::core::status::StatusMask::all());
- *
- * @endcode
- *
- * @see for more information: @ref DCPS_Modules_Subscription_DataReader "Data Reader"
- * @see for more information: @ref DCPS_Modules_Infrastructure_Listener "Listener information"
- */
+/// @brief
+/// DataReader events Listener
+///
+/// Since a DataReader is an Entity, it has the ability to have a Listener
+/// associated with it. In this case, the associated Listener should be of type
+/// DataReaderListener. This interface must be implemented by the
+/// application. A user-defined class must be provided by the application which must
+/// extend from the DataReaderListener class.
+///
+/// <b><i>
+/// All operations for this interface must be implemented in the user-defined class, it is
+/// up to the application whether an operation is empty or contains some functionality.
+/// </i></b>
+///
+/// The DataReaderListener provides a generic mechanism (actually a
+/// callback function) for the Data Distribution Service to notify the application of
+/// relevant asynchronous status change events, such as a missed deadline, violation of
+/// a QosPolicy setting, etc. The DataReaderListener is related to
+/// changes in communication status StatusConditions.
+///
+/// @code{.cpp}
+/// // Application example listener
+/// class ExampleListener :
+///                public virtual dds::sub::DataReaderListener<Foo::Bar>
+/// {
+/// public:
+///     virtual void on_requested_deadline_missed (
+///         dds::sub::DataReader<Foo::Bar>& reader,
+///         const dds::core::status::RequestedDeadlineMissedStatus & status)
+///     {
+///         std::cout << "on_requested_deadline_missed" << std::endl;
+///     }
+///
+///     virtual void on_requested_incompatible_qos (
+///         dds::sub::DataReader<Foo::Bar>& reader,
+///         const dds::core::status::RequestedIncompatibleQosStatus & status)
+///     {
+///         std::cout << "on_requested_incompatible_qos" << std::endl;
+///     }
+///
+///     virtual void on_sample_rejected (
+///         dds::sub::DataReader<Foo::Bar>& reader,
+///         const dds::core::status::SampleRejectedStatus & status)
+///     {
+///         std::cout << "on_sample_rejected" << std::endl;
+///     }
+///
+///     virtual void on_liveliness_changed (
+///         dds::sub::DataReader<Foo::Bar>& reader,
+///         const dds::core::status::LivelinessChangedStatus & status)
+///     {
+///         std::cout << "on_liveliness_changed" << std::endl;
+///     }
+///
+///     virtual void on_data_available (
+///         dds::sub::DataReader<Foo::Bar>& reader)
+///     {
+///         std::cout << "on_data_available" << std::endl;
+///     }
+///
+///     virtual void on_subscription_matched (
+///         dds::sub::DataReader<Foo::Bar>& reader,
+///         const dds::core::status::SubscriptionMatchedStatus & status)
+///     {
+///         std::cout << "on_subscription_matched" << std::endl;
+///     }
+///
+///     virtual void on_sample_lost (
+///         dds::sub::DataReader<Foo::Bar>& reader,
+///         const dds::core::status::SampleLostStatus & status)
+///     {
+///         std::cout << "on_sample_lost" << std::endl;
+///     }
+/// };
+///
+/// // Create DataReader with the listener
+/// dds::domain::DomainParticipant participant(org::eclipse::cyclonedds::domain::default_id());
+/// dds::topic::Topic<Foo::Bar> topic(participant, "TopicName");
+/// dds::sub::Subscriber subscriber(participant);
+/// dds::sub::DataReader<Foo::Bar> reader(subscriber,
+///                                       topic,
+///                                       subscriber.default_datareader_qos(),
+///                                       new ExampleListener(),
+///                                       dds::core::status::StatusMask::all());
+///
+/// @endcode
+///
+/// @see for more information: @ref DCPS_Modules_Subscription_DataReader "Data Reader"
+/// @see for more information: @ref DCPS_Modules_Infrastructure_Listener "Listener information"
 template <typename T>
 class dds::sub::DataReaderListener
 {
@@ -308,22 +305,20 @@ public:
 };
 
 
-/**
- * @brief
- * DataReader events Listener
- *
- * This listener is just like DataReaderListener, except
- * that the application doesn't have to implement all operations.
- *
- * @code{.cpp}
- * class ExampleListener : public virtual dds::sub::NoOpDataReaderListener<Foo::Bar>
- * {
- *    // Not necessary to implement any Listener operations.
- * };
- * @endcode
- *
- * @see dds::sub::DataReaderListener
- */
+/// @brief
+/// DataReader events Listener
+///
+/// This listener is just like DataReaderListener, except
+/// that the application doesn't have to implement all operations.
+///
+/// @code{.cpp}
+/// class ExampleListener : public virtual dds::sub::NoOpDataReaderListener<Foo::Bar>
+/// {
+///    // Not necessary to implement any Listener operations.
+/// };
+/// @endcode
+///
+/// @see dds::sub::DataReaderListener
 template <typename T>
 class dds::sub::NoOpDataReaderListener : public virtual DataReaderListener<T>
 {

@@ -1,16 +1,13 @@
-/*
- * Copyright(c) 2006 to 2021 ZettaScale Technology and others
- *
- * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v. 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0, or the Eclipse Distribution License
- * v. 1.0 which is available at
- * http://www.eclipse.org/org/documents/edl-v10.php.
- *
- * SPDX-License-Identifier: EPL-2.0 OR BSD-3-Clause
- */
-
-
+// Copyright(c) 2006 to 2021 ZettaScale Technology and others
+//
+// This program and the accompanying materials are made available under the
+// terms of the Eclipse Public License v. 2.0 which is available at
+// http://www.eclipse.org/legal/epl-2.0, or the Eclipse Distribution License
+// v. 1.0 which is available at
+// http://www.eclipse.org/org/documents/edl-v10.php.
+//
+// SPDX-License-Identifier: EPL-2.0 OR BSD-3-Clause
+ 
 /**
  * @file
  */
@@ -63,6 +60,7 @@ public:
     void policy(const dds::core::policy::DataRepresentation& datarepresentation);
     void policy(const dds::core::policy::TypeConsistencyEnforcement& typeconsistencyenforcement);
 #endif //  OMG_DDS_EXTENSIBLE_AND_DYNAMIC_TOPIC_TYPE_SUPPORT
+    void policy(const dds::core::policy::WriterBatching&    writerbatching);
 
     template <typename POLICY> const POLICY& policy() const;
     template <typename POLICY> POLICY& policy();
@@ -105,6 +103,7 @@ private:
     dds::core::policy::DataRepresentation      datarepresentation_;
     dds::core::policy::TypeConsistencyEnforcement typeconsistencyenforcement_;
 #endif //  OMG_DDS_EXTENSIBLE_AND_DYNAMIC_TOPIC_TYPE_SUPPORT
+    dds::core::policy::WriterBatching          writerbatching_;
 };
 
 
@@ -272,6 +271,15 @@ DataWriterQosDelegate::policy<dds::core::policy::TypeConsistencyEnforcement>() c
 template<> OMG_DDS_API dds::core::policy::TypeConsistencyEnforcement&
 DataWriterQosDelegate::policy<dds::core::policy::TypeConsistencyEnforcement>();
 #endif //  OMG_DDS_EXTENSIBLE_AND_DYNAMIC_TOPIC_TYPE_SUPPORT
+
+template<> inline const  dds::core::policy::WriterBatching&
+DataWriterQosDelegate::policy<dds::core::policy::WriterBatching>() const
+{
+    return writerbatching_;
+}
+
+template<> OMG_DDS_API dds::core::policy::WriterBatching&
+DataWriterQosDelegate::policy<dds::core::policy::WriterBatching>();
 
 }
 }

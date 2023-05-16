@@ -1,23 +1,22 @@
 #ifndef OMG_DDS_PUB_QOS_DETAIL_DATAWRITER_QOS_HPP_
 #define OMG_DDS_PUB_QOS_DETAIL_DATAWRITER_QOS_HPP_
 
-/* Copyright 2010, Object Management Group, Inc.
- * Copyright 2010, PrismTech, Corp.
- * Copyright 2010, Real-Time Innovations, Inc.
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2010, Object Management Group, Inc.
+// Copyright 2010, PrismTech, Corp.
+// Copyright 2010, Real-Time Innovations, Inc.
+// All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include <dds/core/detail/TEntityQosImpl.hpp>
 #include <org/eclipse/cyclonedds/pub/qos/DataWriterQosDelegate.hpp>
@@ -54,6 +53,7 @@
  * dds::core::policy::WriterDataLifecycle  | Dispose with unregister or not (@ref DCPS_QoS_WriterDataLifecycle "info")  | WriterDataLifecycle::AutoDisposeUnregisteredInstances()
  * dds::core::policy::DataRepresentation   | Supported data representation kinds (@ref DCPS_QoS_DataRepresentation "info") | DataRepresentation::DataRepresentation(dds::core::policy::DataRepresentationId::XCDR1)
  * dds::core::policy::TypeConsistencyEnforcement | Type consistency enforcement policies (@ref DCPS_QoS_TypeConsistencyEnforcement "info") | dds::core::policy::TypeConsistencyKind::DISALLOW_TYPE_COERCION
+ * dds::core::policy::WriterBatching       | Writer data batching                                                       | dds::core::policy::WriterBatching::DoNotBatchUpdates()
  *
  * A QosPolicy can be set when the DataWriter is created or modified with the set
  * qos operation.
@@ -83,62 +83,58 @@ public:
      */
     DataWriterQos(const DataWriterQos& qos);
 
-    /**
-     * Create a DataWriter QoS from a TopicQos.
-     *
-     * This operation will copy the QosPolicy settings from the TopicQos to the
-     * corresponding QosPolicy settings in the DataWriterQos. The related value
-     * in DataWriterQos will be repliced, while the other policies will get the
-     * @ref anchor_dds_pub_datawriter_qos_defaults "default" QoS policies.
-     *
-     * This is a "convenience" operation. It can be used to merge
-     * @ref anchor_dds_pub_datawriter_qos_defaults "default" DataWriter
-     * QosPolicy settings with the corresponding ones on the Topic. The resulting
-     * DataWriterQos can then be used to create a new DataWriter, or set its
-     * DataWriterQos.
-     * @code{.cpp}
-     * dds::topic::qos::TopicQos topicQos = topic.qos();
-     * dds::pub::qos::DataWriterQos writerQos(topicQos);
-     * // Policies of the DataWriterQos that are not present in the TopicQos
-     * // have the default value.
-     * @endcode
-     *
-     * This operation does not check the resulting DataWriterQos for self
-     * consistency. This is because the "merged" DataWriterQos may not be the
-     * final one, as the application can still modify some QosPolicy settings prior to
-     * applying the DataWriterQos to the DataWriter.
-     *
-     * @param qos the QoS to copy policies from.
-     */
+    /// Create a DataWriter QoS from a TopicQos.
+    ///
+    /// This operation will copy the QosPolicy settings from the TopicQos to the
+    /// corresponding QosPolicy settings in the DataWriterQos. The related value
+    /// in DataWriterQos will be repliced, while the other policies will get the
+    /// @ref anchor_dds_pub_datawriter_qos_defaults "default" QoS policies.
+    ///
+    /// This is a "convenience" operation. It can be used to merge
+    /// @ref anchor_dds_pub_datawriter_qos_defaults "default" DataWriter
+    /// QosPolicy settings with the corresponding ones on the Topic. The resulting
+    /// DataWriterQos can then be used to create a new DataWriter, or set its
+    /// DataWriterQos.
+    /// @code{.cpp}
+    /// dds::topic::qos::TopicQos topicQos = topic.qos();
+    /// dds::pub::qos::DataWriterQos writerQos(topicQos);
+    /// // Policies of the DataWriterQos that are not present in the TopicQos
+    /// // have the default value.
+    /// @endcode
+    ///
+    /// This operation does not check the resulting DataWriterQos for self
+    /// consistency. This is because the "merged" DataWriterQos may not be the
+    /// final one, as the application can still modify some QosPolicy settings prior to
+    /// applying the DataWriterQos to the DataWriter.
+    ///
+    /// @param qos the QoS to copy policies from.
     DataWriterQos(const dds::topic::qos::TopicQos& qos);
 
-    /**
-     * Assign dds::topic::qos::TopicQos policies to the DataWriterQos.
-     *
-     * This operation will copy the QosPolicy settings from the TopicQos to the
-     * corresponding QosPolicy settings in the DataWriterQos (replacing the values,
-     * if present).
-     *
-     * This is a "convenience" operation, useful in combination with the operations
-     * Publisher::default_datawriter_qos() and dds::topic::Topic::qos().
-     * This operation can be used to merge the DataWriter
-     * QosPolicy settings with the corresponding ones on the Topic. The resulting
-     * DataWriterQos can then be used to create a new DataWriter, or set its
-     * DataWriterQos.
-     * @code{.cpp}
-     * dds::topic::qos::TopicQos topicQos = topic.qos();
-     * dds::pub::qos::DataWriterQos writerQos = publisher.default_datawriter_qos();
-     * writerQos = topicQos;
-     * // Policies of the DataWriterQos that are not present in the TopicQos are untouched.
-     * @endcode
-     *
-     * This operation does not check the resulting DataWriterQos for self
-     * consistency. This is because the "merged" DataWriterQos may not be the
-     * final one, as the application can still modify some QosPolicy settings prior to
-     * applying the DataWriterQos to the DataWriter.
-     *
-     * @param qos the QoS to copy policies from.
-     */
+    /// Assign dds::topic::qos::TopicQos policies to the DataWriterQos.
+    ///
+    /// This operation will copy the QosPolicy settings from the TopicQos to the
+    /// corresponding QosPolicy settings in the DataWriterQos (replacing the values,
+    /// if present).
+    ///
+    /// This is a "convenience" operation, useful in combination with the operations
+    /// Publisher::default_datawriter_qos() and dds::topic::Topic::qos().
+    /// This operation can be used to merge the DataWriter
+    /// QosPolicy settings with the corresponding ones on the Topic. The resulting
+    /// DataWriterQos can then be used to create a new DataWriter, or set its
+    /// DataWriterQos.
+    /// @code{.cpp}
+    /// dds::topic::qos::TopicQos topicQos = topic.qos();
+    /// dds::pub::qos::DataWriterQos writerQos = publisher.default_datawriter_qos();
+    /// writerQos = topicQos;
+    /// // Policies of the DataWriterQos that are not present in the TopicQos are untouched.
+    /// @endcode
+    ///
+    /// This operation does not check the resulting DataWriterQos for self
+    /// consistency. This is because the "merged" DataWriterQos may not be the
+    /// final one, as the application can still modify some QosPolicy settings prior to
+    /// applying the DataWriterQos to the DataWriter.
+    ///
+    /// @param qos the QoS to copy policies from.
     DataWriterQos& operator= (const dds::topic::qos::TopicQos& other);
 };
 

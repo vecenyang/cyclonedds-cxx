@@ -1,14 +1,13 @@
-/*
- * Copyright(c) 2006 to 2021 ZettaScale Technology and others
- *
- * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v. 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0, or the Eclipse Distribution License
- * v. 1.0 which is available at
- * http://www.eclipse.org/org/documents/edl-v10.php.
- *
- * SPDX-License-Identifier: EPL-2.0 OR BSD-3-Clause
- */
+// Copyright(c) 2006 to 2021 ZettaScale Technology and others
+//
+// This program and the accompanying materials are made available under the
+// terms of the Eclipse Public License v. 2.0 which is available at
+// http://www.eclipse.org/legal/epl-2.0, or the Eclipse Distribution License
+// v. 1.0 which is available at
+// http://www.eclipse.org/org/documents/edl-v10.php.
+//
+// SPDX-License-Identifier: EPL-2.0 OR BSD-3-Clause
+
 #include "dds/dds.hpp"
 #include <gtest/gtest.h>
 
@@ -71,6 +70,7 @@ DataRepresentation     nonDefaultRepresentation({dds::core::policy::DataRepresen
                                                  dds::core::policy::DataRepresentationId::XCDR2});
 TypeConsistencyEnforcement nonDefaultTypeConsistencyEnforcement(dds::core::policy::TypeConsistencyKind::ALLOW_TYPE_COERCION, true, true, true, true, true);
 #endif //  OMG_DDS_EXTENSIBLE_AND_DYNAMIC_TOPIC_TYPE_SUPPORT
+WriterBatching         nonDefaultWriterBatching(true);
 
 
 
@@ -107,6 +107,7 @@ ReaderDataLifecycle tmpRdLifecycle;
 DataRepresentation  tmpRepresentation;
 TypeConsistencyEnforcement  tmpEnforcement;
 #endif //  OMG_DDS_EXTENSIBLE_AND_DYNAMIC_TOPIC_TYPE_SUPPORT
+WriterBatching      tmpWriterBatching;
 
 TEST(Qos, DomainParticipant)
 {
@@ -336,6 +337,9 @@ TEST(Qos, DataWriter)
     DataWriterQos dwQosShifted;
     dwQosShifted << nonDefaultUserData
                  << nonDefaultDurability
+#ifdef  OMG_DDS_PERSISTENCE_SUPPORT
+                 << nonDefaultDurabilityService
+#endif  // OMG_DDS_PERSISTENCE_SUPPORT
                  << nonDefaultDeadline
                  << nonDefaultBudget
                  << nonDefaultLiveliness
@@ -354,6 +358,7 @@ TEST(Qos, DataWriter)
                  << nonDefaultRepresentation
                  << nonDefaultTypeConsistencyEnforcement
 #endif //  OMG_DDS_EXTENSIBLE_AND_DYNAMIC_TOPIC_TYPE_SUPPORT
+                << nonDefaultWriterBatching
                   ;
     DataWriterQos dwQosWConstructed(dwQosShifted);
     DataWriterQos dwQosWAssigned1 = dwQosShifted; /* Actually calls copy constructor. */
@@ -363,6 +368,9 @@ TEST(Qos, DataWriter)
     DataWriterQos dwQosTAssigned2;
     dwQosWAssigned2 = dwQosShifted;
     dwQosTAssigned2 = tQosShifted;
+    dwQosTConstructed << nonDefaultWriterBatching;  /* Necessary, since the TopicQos does not have the WriterBatching QoSPolicy. */
+    dwQosTAssigned1 << nonDefaultWriterBatching;  /* Necessary, since the TopicQos does not have the WriterBatching QoSPolicy. */
+    dwQosTAssigned2 << nonDefaultWriterBatching;  /* Necessary, since the TopicQos does not have the WriterBatching QoSPolicy. */
 
     /* Compare the QoSses. */
     ASSERT_NE(dwQosDefault,      dwQosWConstructed);
@@ -380,6 +388,9 @@ TEST(Qos, DataWriter)
     /* Compare the Policies (getting them in different ways). */
     dwQosShifted >> tmpUserData;
     dwQosShifted >> tmpDurability;
+#ifdef  OMG_DDS_PERSISTENCE_SUPPORT
+    dwQosShifted >> tmpDurabilityService;
+#endif  // OMG_DDS_PERSISTENCE_SUPPORT
     dwQosShifted >> tmpDeadline;
     dwQosShifted >> tmpBudget;
     dwQosShifted >> tmpLiveliness;
@@ -395,8 +406,12 @@ TEST(Qos, DataWriter)
     dwQosShifted >> tmpRepresentation;
     dwQosShifted >> tmpEnforcement;
 #endif //  OMG_DDS_EXTENSIBLE_AND_DYNAMIC_TOPIC_TYPE_SUPPORT
+    dwQosShifted >> tmpWriterBatching;
     ASSERT_EQ(nonDefaultUserData,    tmpUserData);
     ASSERT_EQ(nonDefaultDurability,  tmpDurability);
+#ifdef  OMG_DDS_PERSISTENCE_SUPPORT
+    ASSERT_EQ(nonDefaultDurabilityService,  tmpDurabilityService);
+#endif  // OMG_DDS_PERSISTENCE_SUPPORT
     ASSERT_EQ(nonDefaultDeadline,    tmpDeadline);
     ASSERT_EQ(nonDefaultBudget,      tmpBudget);
     ASSERT_EQ(nonDefaultLiveliness,  tmpLiveliness);
@@ -412,9 +427,13 @@ TEST(Qos, DataWriter)
     ASSERT_EQ(nonDefaultRepresentation, tmpRepresentation);
     ASSERT_EQ(nonDefaultTypeConsistencyEnforcement, tmpEnforcement);
 #endif //  OMG_DDS_EXTENSIBLE_AND_DYNAMIC_TOPIC_TYPE_SUPPORT
+    ASSERT_EQ(nonDefaultWriterBatching, tmpWriterBatching);
 
     ASSERT_EQ(nonDefaultUserData,    dwQosWConstructed.policy<UserData>());
     ASSERT_EQ(nonDefaultDurability,  dwQosWConstructed.policy<Durability>());
+#ifdef  OMG_DDS_PERSISTENCE_SUPPORT
+    ASSERT_EQ(nonDefaultDurabilityService,  dwQosWConstructed.policy<DurabilityService>());
+#endif  // OMG_DDS_PERSISTENCE_SUPPORT
     ASSERT_EQ(nonDefaultDeadline,    dwQosWConstructed.policy<Deadline>());
     ASSERT_EQ(nonDefaultBudget,      dwQosWConstructed.policy<LatencyBudget>());
     ASSERT_EQ(nonDefaultLiveliness,  dwQosWConstructed.policy<Liveliness>());
@@ -430,6 +449,7 @@ TEST(Qos, DataWriter)
     ASSERT_EQ(nonDefaultRepresentation, dwQosWConstructed.policy<DataRepresentation>());
     ASSERT_EQ(nonDefaultTypeConsistencyEnforcement, dwQosWConstructed.policy<TypeConsistencyEnforcement>());
 #endif //  OMG_DDS_EXTENSIBLE_AND_DYNAMIC_TOPIC_TYPE_SUPPORT
+    ASSERT_EQ(nonDefaultWriterBatching, dwQosWConstructed.policy<WriterBatching>());
 
 #ifdef  OMG_DDS_OWNERSHIP_SUPPORT
     dwQosShifted >> tmpStrength;
@@ -646,4 +666,5 @@ TEST(Qos, policy_name)
     ASSERT_EQ(dds::core::policy::policy_name<DataRepresentation>::name(),  "DataRepresentation");
     ASSERT_EQ(dds::core::policy::policy_name<TypeConsistencyEnforcement>::name(),  "TypeConsistencyEnforcement");
 #endif //  OMG_DDS_EXTENSIBLE_AND_DYNAMIC_TOPIC_TYPE_SUPPORT
+    ASSERT_EQ(dds::core::policy::policy_name<WriterBatching>::name(),      "WriterBatching");
 }

@@ -1,15 +1,12 @@
-/*
- * Copyright(c) 2006 to 2021 ZettaScale Technology and others
- *
- * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v. 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0, or the Eclipse Distribution License
- * v. 1.0 which is available at
- * http://www.eclipse.org/org/documents/edl-v10.php.
- *
- * SPDX-License-Identifier: EPL-2.0 OR BSD-3-Clause
- */
-
+// Copyright(c) 2006 to 2021 ZettaScale Technology and others
+//
+// This program and the accompanying materials are made available under the
+// terms of the Eclipse Public License v. 2.0 which is available at
+// http://www.eclipse.org/legal/epl-2.0, or the Eclipse Distribution License
+// v. 1.0 which is available at
+// http://www.eclipse.org/org/documents/edl-v10.php.
+//
+// SPDX-License-Identifier: EPL-2.0 OR BSD-3-Clause
 
 /**
  * @file
@@ -188,6 +185,14 @@ DataWriterQosDelegate::policy(const dds::core::policy::TypeConsistencyEnforcemen
 }
 #endif //  OMG_DDS_EXTENSIBLE_AND_DYNAMIC_TOPIC_TYPE_SUPPORT
 
+void
+DataWriterQosDelegate::policy(const dds::core::policy::WriterBatching& writerbatching)
+{
+    writerbatching.delegate().check();
+    present_ |= DDSI_QP_CYCLONE_WRITER_BATCHING;
+    writerbatching_ = writerbatching;
+}
+
 dds_qos_t*
 DataWriterQosDelegate::ddsc_qos() const
 {
@@ -235,6 +240,8 @@ DataWriterQosDelegate::ddsc_qos() const
     if (present_ & DDSI_QP_TYPE_CONSISTENCY_ENFORCEMENT)
         typeconsistencyenforcement_.delegate().set_c_policy(qos);
 #endif //  OMG_DDS_EXTENSIBLE_AND_DYNAMIC_TOPIC_TYPE_SUPPORT
+    if (present_ & DDSI_QP_CYCLONE_WRITER_BATCHING)
+        writerbatching_.delegate().set_c_policy(qos);
     return qos;
 }
 
@@ -283,6 +290,8 @@ DataWriterQosDelegate::ddsc_qos(const dds_qos_t* qos)
     if (present_ & DDSI_QP_TYPE_CONSISTENCY_ENFORCEMENT)
         typeconsistencyenforcement_.delegate().set_iso_policy(qos);
 #endif //  OMG_DDS_EXTENSIBLE_AND_DYNAMIC_TOPIC_TYPE_SUPPORT
+    if (present_ & DDSI_QP_CYCLONE_WRITER_BATCHING)
+        writerbatching_.delegate().set_iso_policy(qos);
 }
 
 void
@@ -317,6 +326,7 @@ DataWriterQosDelegate::named_qos(const struct _DDS_NamedDataWriterQos &qos)
     datarepresentation_.delegate().v_policy((v_writerDataRepresentationPolicy&)(q->writer_datarepresentation));
     typeconsistencyenforcement_.delegate().v_policy((v_writerTypeConsistencyEnforcementPolicy&)(q->writer_typeconsistencyenforcement));
 #endif //  OMG_DDS_EXTENSIBLE_AND_DYNAMIC_TOPIC_TYPE_SUPPORT
+    writerbatching_.delegate().v_policy((v_writerbatchingPolicy&)(q->writer_batching)     );
 #endif
 }
 
@@ -355,6 +365,7 @@ DataWriterQosDelegate::operator ==(const DataWriterQosDelegate& other) const
         && other.datarepresentation_ == datarepresentation_
         && other.typeconsistencyenforcement_ == typeconsistencyenforcement_
 #endif //  OMG_DDS_EXTENSIBLE_AND_DYNAMIC_TOPIC_TYPE_SUPPORT
+        && other.writerbatching_ == writerbatching_
            ;
 }
 
@@ -363,6 +374,10 @@ DataWriterQosDelegate::operator =(const org::eclipse::cyclonedds::topic::qos::To
 {
     if (tqos.present() & DDSI_QP_DURABILITY)
       policy(tqos.policy<dds::core::policy::Durability>());
+#ifdef  OMG_DDS_PERSISTENCE_SUPPORT
+    if (tqos.present() & DDSI_QP_DURABILITY_SERVICE)
+      policy(tqos.policy<dds::core::policy::DurabilityService>());
+#endif  // OMG_DDS_PERSISTENCE_SUPPORT
     if (tqos.present() & DDSI_QP_DEADLINE)
       policy(tqos.policy<dds::core::policy::Deadline>());
     if (tqos.present() & DDSI_QP_LATENCY_BUDGET)
@@ -516,6 +531,13 @@ DataWriterQosDelegate::policy<dds::core::policy::TypeConsistencyEnforcement>()
     return typeconsistencyenforcement_;
 }
 #endif //  OMG_DDS_EXTENSIBLE_AND_DYNAMIC_TOPIC_TYPE_SUPPORT
+
+template<> dds::core::policy::WriterBatching&
+DataWriterQosDelegate::policy<dds::core::policy::WriterBatching>()
+{
+    present_ |= DDSI_QP_CYCLONE_WRITER_BATCHING;
+    return writerbatching_;
+}
 
 }
 }

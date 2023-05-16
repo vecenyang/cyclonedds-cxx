@@ -1,23 +1,22 @@
 #ifndef OMG_TDDS_CORE_POLICY_CORE_POLICY_HPP_
 #define OMG_TDDS_CORE_POLICY_CORE_POLICY_HPP_
 
-/* Copyright 2010, Object Management Group, Inc.
- * Copyright 2010, PrismTech, Corp.
- * Copyright 2010, Real-Time Innovations, Inc.
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2010, Object Management Group, Inc.
+// Copyright 2010, PrismTech, Corp.
+// Copyright 2010, Real-Time Innovations, Inc.
+// All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include <dds/core/detail/conformance.hpp>
 #include <dds/core/LengthUnlimited.hpp>
@@ -841,6 +840,66 @@ public:
      * set to false
      */
     static TWriterDataLifecycle ManuallyDisposeUnregisteredInstances();
+
+};
+//==============================================================================
+
+template <typename D>
+class TWriterBatching : public dds::core::Value<D>
+{
+public:
+    /**
+     * Creates a WriterBatching QoS instance
+     *
+     * @param batch_updates a boolean indicating if updates should be batched
+     * before being explicitly flushed
+     */
+    explicit TWriterBatching(bool batch_updates = false);
+
+    /**
+     * Copies a WriterBatching QoS instance
+     *
+     * @param other the WriterBatching QoS instance to copy
+     */
+    TWriterBatching(const TWriterBatching& other);
+
+    /**
+     * Copies a WriterBatching QoS instance
+     *
+     * @param other the WriterBatching QoS instance to copy
+     *
+     * @return reference to the WriterBatching QoS instance that was copied to
+     */
+    TWriterBatching& operator=(const TWriterBatching& other) = default;
+
+public:
+    /**
+     * Gets a boolean indicating if updates should be batched
+     *
+     * @return a boolean indicating if updates should be batched
+     */
+    bool batch_updates() const;
+
+    /**
+     * Sets a boolean indicating if updates should be batched
+     *
+     * @param batch_updates a boolean indicating if updates should be batched
+     */
+    TWriterBatching& batch_updates(
+        bool batch_updates);
+
+public:
+    /**
+     * @return a WriterBatching QoS instance with batch_updates
+     * set to true
+     */
+    static TWriterBatching BatchUpdates();
+
+    /**
+     * @return a WriterBatching QoS instance with batch_updates
+     * set to false
+     */
+    static TWriterBatching DoNotBatchUpdates();
 
 };
 

@@ -1,15 +1,12 @@
-/*
- * Copyright(c) 2006 to 2022 ZettaScale Technology and others
- *
- * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v. 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0, or the Eclipse Distribution License
- * v. 1.0 which is available at
- * http://www.eclipse.org/org/documents/edl-v10.php.
- *
- * SPDX-License-Identifier: EPL-2.0 OR BSD-3-Clause
- */
-
+// Copyright(c) 2006 to 2022 ZettaScale Technology and others
+//
+// This program and the accompanying materials are made available under the
+// terms of the Eclipse Public License v. 2.0 which is available at
+// http://www.eclipse.org/legal/epl-2.0, or the Eclipse Distribution License
+// v. 1.0 which is available at
+// http://www.eclipse.org/org/documents/edl-v10.php.
+//
+// SPDX-License-Identifier: EPL-2.0 OR BSD-3-Clause
 
 /**
  * @file
@@ -1576,6 +1573,7 @@ void UserDataDelegate::set_c_policy(dds_qos_t* qos) const
         void* data = NULL;
         org::eclipse::cyclonedds::core::convertByteSeq(value_, data, static_cast<int32_t>(value_.size()));
         dds_qset_userdata(qos, data, value_.size());
+        dds_free(data);
     }
 }
 
@@ -1621,6 +1619,43 @@ void WriterDataLifecycleDelegate::set_iso_policy(const dds_qos_t* qos)
 void WriterDataLifecycleDelegate::set_c_policy(dds_qos_t* qos) const
 {
     dds_qset_writer_data_lifecycle(qos, autodispose_);
+}
+
+
+//==============================================================================
+
+WriterBatchingDelegate::WriterBatchingDelegate(bool batch_updates): batch_updates_(batch_updates)
+{
+}
+
+bool WriterBatchingDelegate::batch_updates() const
+{
+    return batch_updates_;
+}
+
+void WriterBatchingDelegate::batch_updates(bool b)
+{
+    batch_updates_ = b;
+}
+
+bool WriterBatchingDelegate::operator ==(const WriterBatchingDelegate& other) const
+{
+    return other.batch_updates() == batch_updates_;
+}
+
+void WriterBatchingDelegate::check() const
+{
+    /* The batch_updates is just a boolean: nothing to check. */
+}
+
+void WriterBatchingDelegate::set_iso_policy(const dds_qos_t* qos)
+{
+    (void)dds_qget_writer_batching(qos, &batch_updates_);
+}
+
+void WriterBatchingDelegate::set_c_policy(dds_qos_t* qos) const
+{
+    dds_qset_writer_batching(qos, batch_updates_);
 }
 
 

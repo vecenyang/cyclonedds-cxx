@@ -1,15 +1,12 @@
-/*
- * Copyright(c) 2006 to 2020 ZettaScale Technology and others
- *
- * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v. 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0, or the Eclipse Distribution License
- * v. 1.0 which is available at
- * http://www.eclipse.org/org/documents/edl-v10.php.
- *
- * SPDX-License-Identifier: EPL-2.0 OR BSD-3-Clause
- */
-
+// Copyright(c) 2006 to 2020 ZettaScale Technology and others
+//
+// This program and the accompanying materials are made available under the
+// terms of the Eclipse Public License v. 2.0 which is available at
+// http://www.eclipse.org/legal/epl-2.0, or the Eclipse Distribution License
+// v. 1.0 which is available at
+// http://www.eclipse.org/org/documents/edl-v10.php.
+//
+// SPDX-License-Identifier: EPL-2.0 OR BSD-3-Clause
 
 /**
  * @file
@@ -56,8 +53,8 @@ void dds::core::Time::sec(int64_t s)
     if(s < 0 && s != -1) {
         ISOCPP_THROW_EXCEPTION(ISOCPP_ERROR, "dds::core::Time::sec out of bounds");
     } else {
-        /** @internal @bug OSPL-2308 RTF Time-ish coercion issue
-        @see http://jira.prismtech.com:8080/browse/OSPL-2308 */
+        /// @internal @bug OSPL-2308 RTF Time-ish coercion issue
+        /// @see http://jira.prismtech.com:8080/browse/OSPL-2308
         sec_ =  s;
     }
 }

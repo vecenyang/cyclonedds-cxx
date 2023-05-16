@@ -1,23 +1,22 @@
 #ifndef OMG_TDDS_CORE_COND_GUARD_CONDITION_HPP_
 #define OMG_TDDS_CORE_COND_GUARD_CONDITION_HPP_
 
-/* Copyright 2010, Object Management Group, Inc.
- * Copyright 2010, PrismTech, Corp.
- * Copyright 2010, Real-Time Innovations, Inc.
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2010, Object Management Group, Inc.
+// Copyright 2010, PrismTech, Corp.
+// Copyright 2010, Real-Time Innovations, Inc.
+// All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include <dds/core/cond/Condition.hpp>
 
@@ -34,35 +33,33 @@ class TGuardCondition;
 }
 }
 
-/**
- * @brief
- * A GuardCondition object is a specific Condition whose trigger_value is
- * completely under the control of the application.
- *
- * When a GuardCondition is initially created, the trigger_value is FALSE.
- *
- * The purpose of the GuardCondition is to provide the means for the
- * application to manually triggering a WaitSet to stop waiting. This is accomplished by
- * attaching the GuardCondition to the WaitSet and then setting the
- * trigger_value by means of the set trigger_value operation.
- *
- * @code{.cpp}
- * dds::core::cond::GuardCondition guard;
- * dds::core::cond::WaitSet waitset;
- * waitset.attach_condition(guard);
- * waitset.wait();
- * ...
- * // To wakeup waitset, do in another thread:
- * guard.trigger_value(true);
- * @endcode
- * See the @ref anchor_dds_core_cond_waitset_examples "WaitSet examples" for more examples.<br>
- * Although the WaitSet examples use the StatusCondition, the basic usage of this Condition
- * with a WaitSet is the same.
- *
- * @see dds::core::cond::Condition
- * @see for more information: @ref DCPS_Modules_Infrastructure_Waitset "WaitSet concept"
- * @see for more information: @ref anchor_dds_core_cond_waitset_examples "WaitSet examples"
- */
+/// @brief
+/// A GuardCondition object is a specific Condition whose trigger_value is
+/// completely under the control of the application.
+///
+/// When a GuardCondition is initially created, the trigger_value is FALSE.
+///
+/// The purpose of the GuardCondition is to provide the means for the
+/// application to manually triggering a WaitSet to stop waiting. This is accomplished by
+/// attaching the GuardCondition to the WaitSet and then setting the
+/// trigger_value by means of the set trigger_value operation.
+///
+/// @code{.cpp}
+/// dds::core::cond::GuardCondition guard;
+/// dds::core::cond::WaitSet waitset;
+/// waitset.attach_condition(guard);
+/// waitset.wait();
+/// ...
+/// // To wakeup waitset, do in another thread:
+/// guard.trigger_value(true);
+/// @endcode
+/// See the @ref anchor_dds_core_cond_waitset_examples "WaitSet examples" for more examples.<br>
+/// Although the WaitSet examples use the StatusCondition, the basic usage of this Condition
+/// with a WaitSet is the same.
+///
+/// @see dds::core::cond::Condition
+/// @see for more information: @ref DCPS_Modules_Infrastructure_Waitset "WaitSet concept"
+/// @see for more information: @ref anchor_dds_core_cond_waitset_examples "WaitSet examples"
 template <typename DELEGATE>
 class dds::core::cond::TGuardCondition : public dds::core::cond::TCondition<DELEGATE>
 {

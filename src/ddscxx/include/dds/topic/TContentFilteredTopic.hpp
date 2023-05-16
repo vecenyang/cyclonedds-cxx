@@ -1,23 +1,22 @@
 #ifndef OMG_DDS_T_TOPIC_CONTENT_FILTERED_TOPIC_HPP_
 #define OMG_DDS_T_TOPIC_CONTENT_FILTERED_TOPIC_HPP_
 
-/* Copyright 2010, Object Management Group, Inc.
- * Copyright 2010, PrismTech, Inc.
- * Copyright 2010, Real-Time Innovations, Inc.
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2010, Object Management Group, Inc.
+// Copyright 2010, PrismTech, Inc.
+// Copyright 2010, Real-Time Innovations, Inc.
+// All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include <vector>
 
@@ -38,41 +37,39 @@ class ContentFilteredTopic;
 }
 
 
-/**
- * @brief
- * ContentFilteredTopic is a specialization of TopicDescription that allows
- * for content-based subscriptions.
- *
- * ContentFilteredTopic describes a more sophisticated subscription which
- * indicates that the Subscriber does not necessarily want to see all values of each
- * instance published under the Topic. Rather, it only wants to see the values whose
- * contents satisfy certain criteria. Therefore this class must be used to request
- * content-based subscriptions.
- *
- * The selection of the content is done using the SQL based filter with parameters to
- * adapt the filter clause.
- *
- * <b><i>Example</i></b>
- * @code{.cpp}
- * // Default creation of a Topic
- * dds::domain::DomainParticipant participant(org::eclipse::cyclonedds::domain::default_id());
- * dds::topic::Topic<Foo::Bar> topic(participant, "TopicName");
- *
- * // Creation of a ContentFilteredTopic (assume Foo::Bar contains long_1 element).
- * std::vector<std::string> params;
- * params.push_back("1");
- * dds::topic::Filter filter("long_1=%0", params);
- * dds::topic::ContentFilteredTopic<Foo::Bar> cfTopic(topic,
- *                                                    "ContentFilteredTopicName",
- *                                                    filter);
- *
- * // The ContentFilteredTopic can be used to create readers
- * dds::sub::Subscriber subscriber(participant);
- * dds::sub::DataReader<Foo::Bar> reader(subscriber, cfTopic);
- * @endcode
- *
- * @see for more information: @ref DCPS_Modules_TopicDefinition "Topic Definition"
- */
+/// @brief
+/// ContentFilteredTopic is a specialization of TopicDescription that allows
+/// for content-based subscriptions.
+///
+/// ContentFilteredTopic describes a more sophisticated subscription which
+/// indicates that the Subscriber does not necessarily want to see all values of each
+/// instance published under the Topic. Rather, it only wants to see the values whose
+/// contents satisfy certain criteria. Therefore this class must be used to request
+/// content-based subscriptions.
+///
+/// The selection of the content is done using the SQL based filter with parameters to
+/// adapt the filter clause.
+///
+/// <b><i>Example</i></b>
+/// @code{.cpp}
+/// // Default creation of a Topic
+/// dds::domain::DomainParticipant participant(org::eclipse::cyclonedds::domain::default_id());
+/// dds::topic::Topic<Foo::Bar> topic(participant, "TopicName");
+///
+/// // Creation of a ContentFilteredTopic (assume Foo::Bar contains long_1 element).
+/// std::vector<std::string> params;
+/// params.push_back("1");
+/// dds::topic::Filter filter("long_1=%0", params);
+/// dds::topic::ContentFilteredTopic<Foo::Bar> cfTopic(topic,
+///                                                    "ContentFilteredTopicName",
+///                                                    filter);
+///
+/// // The ContentFilteredTopic can be used to create readers
+/// dds::sub::Subscriber subscriber(participant);
+/// dds::sub::DataReader<Foo::Bar> reader(subscriber, cfTopic);
+/// @endcode
+///
+/// @see for more information: @ref DCPS_Modules_TopicDefinition "Topic Definition"
 template <typename T, template <typename Q> class DELEGATE>
 class dds::topic::ContentFilteredTopic final : public dds::topic::TTopicDescription< DELEGATE<T> >
 {

@@ -1,23 +1,22 @@
 #ifndef OMG_DDS_CORE_REFERENCE_HPP_
 #define OMG_DDS_CORE_REFERENCE_HPP_
 
-/* Copyright 2010, Object Management Group, Inc.
- * Copyright 2010, PrismTech, Inc.
- * Copyright 2010, Real-Time Innovations, Inc.
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2010, Object Management Group, Inc.
+// Copyright 2010, PrismTech, Inc.
+// Copyright 2010, Real-Time Innovations, Inc.
+// All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include <dds/core/types.hpp>
 #include <dds/core/refmacros.hpp>
@@ -226,35 +225,31 @@ public:
      */
     bool is_nil() const;
 
-    /**
-     * Special operator== used to check if this reference object
-     * equals the <i>dds::core::null</i> reference.
-     *
-     * The null-check can be done like this:
-     * @code{.cpp}
-     * if (r == dds::core::null) {
-     *    // Do not use the dds reference object r in its current state
-     * }
-     * @endcode
-     *
-     * @return true if this reference is null.
-     */
+    /// Special operator== used to check if this reference object
+    /// equals the <i>dds::core::null</i> reference.
+    ///
+    /// The null-check can be done like this:
+    /// @code{.cpp}
+    /// if (r == dds::core::null) {
+    ///    // Do not use the dds reference object r in its current state
+    /// }
+    /// @endcode
+    ///
+    /// @return true if this reference is null.
     bool
     operator==(const null_type) const;
 
-    /**
-     * Special operator!= used to check if this reference object
-     * does not equal the <i>dds::core::null</i> reference.
-     *
-     * The non-null-check can be done like this:
-     * @code{.cpp}
-     * if (r != dds::core::null) {
-     *    // Use the dds reference object r
-     * }
-     * @endcode
-     *
-     * @return true if this reference is not null.
-     */
+    /// Special operator!= used to check if this reference object
+    /// does not equal the <i>dds::core::null</i> reference.
+    ///
+    /// The non-null-check can be done like this:
+    /// @code{.cpp}
+    /// if (r != dds::core::null) {
+    ///    // Use the dds reference object r
+    /// }
+    /// @endcode
+    ///
+    /// @return true if this reference is not null.
     bool operator!=(const null_type nil) const;
 
 private:
@@ -320,34 +315,30 @@ protected:
 } /* namespace dds / namespace core */
 
 
-/**
- * Special operator== used to check if this reference object
- * does not equal the <i>dds::core::null</i> reference.
- *
- * The non-null-check can be done like this:
- * @code{.cpp}
- * if (dds::core::null == r) {
- *    // Do not use the dds reference object r in its current state
- * }
- * @endcode
- *
- * @return true if this reference is not null.
- */
+/// Special operator== used to check if this reference object
+/// does not equal the <i>dds::core::null</i> reference.
+///
+/// The non-null-check can be done like this:
+/// @code{.cpp}
+/// if (dds::core::null == r) {
+///    // Do not use the dds reference object r in its current state
+/// }
+/// @endcode
+///
+/// @return true if this reference is not null.
 template <class D> bool operator == (dds::core::null_type, const dds::core::Reference<D>& r);
 
-/**
- * Special operator!= used to check if this reference object
- * does not equal the <i>dds::core::null</i> reference.
- *
- * The non-null-check can be done like this:
- * @code{.cpp}
- * if (dds::core::null != r) {
- *    // Use the dds reference object r
- * }
- * @endcode
- *
- * @return true if this reference is not null.
- */
+/// Special operator!= used to check if this reference object
+/// does not equal the <i>dds::core::null</i> reference.
+///
+/// The non-null-check can be done like this:
+/// @code{.cpp}
+/// if (dds::core::null != r) {
+///    // Use the dds reference object r
+/// }
+/// @endcode
+///
+/// @return true if this reference is not null.
 template <class D> bool operator != (dds::core::null_type, const dds::core::Reference<D>& r);
 
 #endif /* OMG_DDS_CORE_REFERENCE_HPP_ */

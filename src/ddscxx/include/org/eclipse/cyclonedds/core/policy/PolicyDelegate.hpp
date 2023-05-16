@@ -1,15 +1,12 @@
-/*
- * Copyright(c) 2006 to 2021 ZettaScale Technology and others
- *
- * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v. 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0, or the Eclipse Distribution License
- * v. 1.0 which is available at
- * http://www.eclipse.org/org/documents/edl-v10.php.
- *
- * SPDX-License-Identifier: EPL-2.0 OR BSD-3-Clause
- */
-
+// Copyright(c) 2006 to 2021 ZettaScale Technology and others
+//
+// This program and the accompanying materials are made available under the
+// terms of the Eclipse Public License v. 2.0 which is available at
+// http://www.eclipse.org/legal/epl-2.0, or the Eclipse Distribution License
+// v. 1.0 which is available at
+// http://www.eclipse.org/org/documents/edl-v10.php.
+//
+// SPDX-License-Identifier: EPL-2.0 OR BSD-3-Clause
 
 /**
  * @file
@@ -898,6 +895,26 @@ private:
     bool autodispose_;
 };
 
+//==============================================================================
+
+class OMG_DDS_API WriterBatchingDelegate
+{
+public:
+    explicit WriterBatchingDelegate(bool batch_updates);
+
+    bool batch_updates() const;
+    void batch_updates(bool b);
+
+    bool operator ==(const WriterBatchingDelegate& other) const;
+
+    void check() const;
+
+    void set_iso_policy(const dds_qos_t* qos);
+    void set_c_policy(dds_qos_t* qos) const;
+
+private:
+    bool batch_updates_;
+};
 
 
 #ifdef  OMG_DDS_EXTENSIBLE_AND_DYNAMIC_TOPIC_TYPE_SUPPORT
