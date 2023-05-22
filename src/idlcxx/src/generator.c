@@ -992,7 +992,23 @@ idl_retcode_t generate(const idl_pstate_t *pstate, const idlc_generator_config_t
 
   file = sep ? sep + 1 : path;
   if (idl_isabsolute(path) || !sep)
-    dir = empty;
+  {
+    if (config->output_dir)
+    {
+      if (idl_isabsolute(config->output_dir))
+        dir = idl_strndup(config->output_dir, strlen(config->output_dir));
+      else
+      {
+        char* basedir = idl_strndup(path, (size_t)(sep-path));
+        idl_asprintf(&dir, "%s/%s", basedir, config->output_dir);
+        free(basedir);
+      }
+      if(idl_mkpath(dir) < 0)
+        goto err_basename;
+    }
+    else
+      dir = empty;
+  }
   else if (!(dir = idl_strndup(path, (size_t)(sep-path))))
     goto err_dir;
   if (!(basename = idl_strndup(file, ext ? (size_t)(ext-file) : strlen(file))))
