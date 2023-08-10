@@ -23,6 +23,7 @@ idlcxx_generate(TARGET ddscxx_test_types FILES
   data/RegressionModels.idl
   data/RegressionModels_pragma.idl
   data/ExternalModels.idl
+  data/KeyHashModels.idl
   data/TraitsModels.idl
   WARNINGS no-implicit-extensibility)
 
@@ -67,9 +68,10 @@ set(sources
   External.cpp
   DataModels.cpp
   SampleInfo.cpp
-  DeferredDestruction.cpp)
+  DeferredDestruction.cpp
+  KeyHash.cpp)
 
-if (ENABLE_TYPE_DISCOVERY AND ENABLE_TOPIC_DISCOVERY)
+if (ENABLE_TYPELIB AND ENABLE_TOPIC_DISCOVERY)
   # Add topic/type discovery tests
   list(APPEND sources
     FindTopic.cpp

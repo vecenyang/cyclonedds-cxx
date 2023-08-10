@@ -127,7 +127,7 @@ private:
    *
    * @return Whether a header is necessary for the entity.
    */
-  bool header_necessary(const entity_properties_t &props);
+  inline bool header_necessary(const entity_properties_t &props) const { return props.p_ext == extensibility::ext_mutable || props.is_optional; }
 
   /**
    * @brief
@@ -137,7 +137,7 @@ private:
    *
    * @return Whether a parameter list is necessary for the entity.
    */
-  bool list_necessary(const entity_properties_t &props);
+  inline bool list_necessary(const entity_properties_t &props) const { return props.e_ext == extensibility::ext_mutable; }
 
   /**
    * @brief
@@ -242,18 +242,18 @@ private:
  *
  * @return Whether the operation was completed succesfully.
  */
-template<typename T, std::enable_if_t<std::is_enum<T>::value && !std::is_arithmetic<T>::value, bool> = true >
+template<typename T, std::enable_if_t<std::is_enum<T>::value, bool> = true >
 bool read(xcdr_v1_stream& str, T& toread, size_t N = 1)
 {
-  switch (str.is_key() ? bb_32_bits : get_bit_bound<T>())
+  switch (get_bit_bound<T>())
   {
-    case bb_8_bits:
+    case bit_bound::bb_8_bits:
       return read_enum_impl<xcdr_v1_stream,T,uint8_t>(str, toread, N);
       break;
-    case bb_16_bits:
+    case bit_bound::bb_16_bits:
       return read_enum_impl<xcdr_v1_stream,T,uint16_t>(str, toread, N);
       break;
-    case bb_32_bits:
+    case bit_bound::bb_32_bits:
       return read_enum_impl<xcdr_v1_stream,T,uint32_t>(str, toread, N);
       break;
     default:
@@ -272,18 +272,18 @@ bool read(xcdr_v1_stream& str, T& toread, size_t N = 1)
  *
  * @return Whether the operation was completed succesfully.
  */
-template<typename T, std::enable_if_t<std::is_enum<T>::value && !std::is_arithmetic<T>::value, bool> = true >
+template<typename T, std::enable_if_t<std::is_enum<T>::value, bool> = true >
 bool write(xcdr_v1_stream& str, const T& towrite, size_t N = 1)
 {
-  switch (str.is_key() ? bb_32_bits : get_bit_bound<T>())
+  switch (get_bit_bound<T>())
   {
-    case bb_8_bits:
+    case bit_bound::bb_8_bits:
       return write_enum_impl<xcdr_v1_stream,T,uint8_t>(str, towrite, N);
       break;
-    case bb_16_bits:
+    case bit_bound::bb_16_bits:
       return write_enum_impl<xcdr_v1_stream,T,uint16_t>(str, towrite, N);
       break;
-    case bb_32_bits:
+    case bit_bound::bb_32_bits:
       return write_enum_impl<xcdr_v1_stream,T,uint32_t>(str, towrite, N);
       break;
     default:
@@ -301,18 +301,18 @@ bool write(xcdr_v1_stream& str, const T& towrite, size_t N = 1)
  *
  * @return Whether the operation was completed succesfully.
  */
-template<typename T, std::enable_if_t<std::is_enum<T>::value && !std::is_arithmetic<T>::value, bool> = true >
+template<typename T, std::enable_if_t<std::is_enum<T>::value, bool> = true >
 bool move(xcdr_v1_stream& str, const T&, size_t N = 1)
 {
-  switch (str.is_key() ? bb_32_bits : get_bit_bound<T>())
+  switch (get_bit_bound<T>())
   {
-    case bb_8_bits:
+    case bit_bound::bb_8_bits:
       return move(str, int8_t(0), N);
       break;
-    case bb_16_bits:
+    case bit_bound::bb_16_bits:
       return move(str, int16_t(0), N);
       break;
-    case bb_32_bits:
+    case bit_bound::bb_32_bits:
       return move(str, int32_t(0), N);
       break;
     default:
@@ -331,7 +331,7 @@ bool move(xcdr_v1_stream& str, const T&, size_t N = 1)
  *
  * @return Whether the operation was completed succesfully.
  */
-template<typename T, std::enable_if_t<std::is_enum<T>::value && !std::is_arithmetic<T>::value, bool> = true >
+template<typename T, std::enable_if_t<std::is_enum<T>::value, bool> = true >
 bool max(xcdr_v1_stream& str, const T& max_sz, size_t N = 1)
 {
   return move(str, max_sz, N);

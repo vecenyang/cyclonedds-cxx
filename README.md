@@ -57,8 +57,8 @@ There are some configuration options specified using CMake defines in addition t
 * `-DBUILD_EXAMPLES=ON`: to build examples
 * `-DENABLE_LEGACY=YES`: to enable legacy c++11 mode, adds boost as dependency (otherwise it uses c++17)
 * `-DENABLE_SHM=YES`: to enable shared memory support
-* `-DENABLE_TYPE_DISCOVERY=YES`: to enable type discovery support
-* `-DENABLE_TOPIC_DISCOVERY=YES`: to enable topic discovery support 
+* `-DENABLE_TYPELIB=YES`: to enable type library support
+* `-DENABLE_TOPIC_DISCOVERY=YES`: to enable topic discovery support
 * `-DENABLE_COVERAGE=YES`: to enable coverage build
 
 ### For application developers
@@ -127,22 +127,10 @@ variable `BUILD_TESTING` to on when configuring, e.g.:
     $ cmake --build .
     $ ctest
 
-Such a build requires the presence of [Google Test][7]. You can install this
-yourself, or you can choose to instead rely on the [Conan][8] package manager
-that the CI build infrastructure also uses. In that case, install Conan and do:
-
-    $ conan install .. --build missing
-
-in the build directory prior to running `cmake`. This will automatically
-download and/or build Google Test.
-
-For Windows, depending on the generator, you might also need to add switches
-to select the architecture and build type, e.g.,
-
-    $ conan install -s arch=x86_64 -s build_type=Debug ..
+Such a build requires the presence of [Google Test][7]. You need to install this
+yourself.
 
 [7]: https://github.com/google/googletest
-[8]: https://conan.io/
 
 ## Documentation
 

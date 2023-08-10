@@ -63,33 +63,22 @@ bool cdr_stream::finish_struct(const entity_properties_t &props, const member_id
   }
 }
 
-const entity_properties_t *cdr_stream::first_entity(const entity_properties_t *props)
+const entity_properties_t *cdr_stream::first_entity(const entity_properties_t *prop)
 {
-  const entity_properties_t *prop = props->first_member;
-  while (m_key && prop && !prop->is_key)
-    prop = next_entity(prop);
-
-  return prop;
+  assert(prop);
+  return prop->first_entity(m_key);
 }
 
 const entity_properties_t* cdr_stream::next_entity(const entity_properties_t *prop)
 {
-  prop = prop->next_on_level;
-  if (m_key) {
-    while (prop && !prop->is_key)
-      prop = prop->next_on_level;
-  }
-  return prop;
+  assert(prop);
+  return prop->next_entity(m_key);
 }
 
 const entity_properties_t* cdr_stream::previous_entity(const entity_properties_t *prop)
 {
-  prop = prop->prev_on_level;
-  if (m_key) {
-    while (prop && !prop->is_key)
-      prop = prop->prev_on_level;
-  }
-  return prop;
+  assert(prop);
+  return prop->previous_entity(m_key);
 }
 
 bool cdr_stream::bytes_available(size_t N, bool peek)
@@ -142,6 +131,45 @@ bool cdr_stream::finish_member(const entity_properties_t &props, member_id_set &
   if (is_set)
     member_ids.insert(props.m_id);
   return true;
+}
+
+void cdr_stream::set_mode(stream_mode mode, key_mode key)
+{
+  assert(key != key_mode::unset);
+  m_mode = mode;
+  m_key = key;
+  reset();
+}
+
+size_t cdr_stream::incr_position(size_t incr_by)
+{
+  if (m_position != SIZE_MAX)
+    m_position += incr_by;
+  return m_position;
+}
+
+bool cdr_stream::status(serialization_status toadd)
+{
+  m_status |= static_cast<uint64_t>(toadd);
+  return abort_status();
+}
+
+bool cdr_stream::is_key() const
+{
+  assert(m_key != key_mode::unset);
+  return m_key == key_mode::sorted || m_key == key_mode::unsorted;
+}
+
+void cdr_stream::push_member_start()
+{
+  m_e_sz.push(0);
+  m_e_off.push(static_cast<uint32_t>(position()));
+}
+
+void cdr_stream::pop_member_start()
+{
+  m_e_sz.pop();
+  m_e_off.pop();
 }
 
 }

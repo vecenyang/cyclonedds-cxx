@@ -53,12 +53,33 @@ namespace cdr {
  * @var bit_bound::bb_32_bits The bit width of the entity is at most 32 bits (4 bytes).
  * @var bit_bound::bb_64_bits The bit width of the entity is at most 64 bits (8 bytes).
  */
-enum bit_bound {
+enum class bit_bound {
   bb_unset = 0,
   bb_8_bits = 1,
   bb_16_bits = 2,
   bb_32_bits = 4,
   bb_64_bits = 8
+};
+
+/**
+ * @brief
+ * Key mode descriptors.
+ *
+ * @enum key_mode Describes the manner of writing of a stream.
+ *
+ * This value is used to determine which fields to write and in which order to write them.
+ * Mainly used to get the first/next/previous entity from the entity properties describing a datatype.
+ *
+ * @var key_mode::unset The key_mode of streaming is unset.
+ * @var key_mode::not_key The key_mode of streaming is not a key, all members will be streamed in declaration order.
+ * @var key_mode::unsorted The key_mode of streaming is key mode, only members will be streamed in declaration order.
+ * @var key_mode::sorted The key_mode of streaming is keyhash mode, only members will be streamed in member id order.
+ */
+enum class key_mode {
+  unset,
+  not_key,
+  unsorted,
+  sorted
 };
 
 /**
@@ -75,43 +96,63 @@ DDSCXX_WARNING_MSVC_ON(4251)
 
 /**
  * @brief
- * Primitive type/enum get_bit_bound function.
- *
- * Returns a bb_unset for all primitive types and enums.
- * This function will be implemented for all enums with a manually defined bit_bound.
- *
- * @return The bit bound for the primitive type.
- */
-template<typename T, DDSCXX_STD_IMPL::enable_if_t<std::is_arithmetic<T>::value || std::is_enum<T>::value, bool> = true >
-bit_bound get_bit_bound() {
-  switch (sizeof(T)) {
-    case 1:
-      return bb_8_bits;
-      break;
-    case 2:
-      return bb_16_bits;
-      break;
-    case 4:
-      return bb_32_bits;
-      break;
-    case 8:
-      return bb_64_bits;
-      break;
-    default:
-      return bb_unset;
-  }
-}
-
-/**
- * @brief
  * Generic get_bit_bound fallback function.
  *
- * Returns a bb_unset for all non-primitive, non-enum types.
+ * Returns a bb_unset for all non-primitive, non-enum types or primitives/enums with non 1,2,4,8 sizes.
  *
  * @return bb_unset always.
  */
-template<typename T, DDSCXX_STD_IMPL::enable_if_t<!std::is_enum<T>::value && !std::is_arithmetic<T>::value, bool> = true >
-constexpr bit_bound get_bit_bound() { return bb_unset;}
+template<typename T, DDSCXX_STD_IMPL::enable_if_t<(!std::is_arithmetic<T>::value && !std::is_enum<T>::value) || (sizeof(T) != 1 && sizeof(T) != 2 && sizeof(T) != 4 && sizeof(T) != 8), bool> = true >
+constexpr bit_bound get_bit_bound() { return bit_bound::bb_unset; }
+
+/**
+ * @brief
+ * Primitive type/enum get_bit_bound function.
+ *
+ * Returns the bitbound for primitives/enums with size 1.
+ * This function will be specialized for all enums with a manually defined bit_bound.
+ *
+ * @return bb_8_bits always.
+ */
+template<typename T, DDSCXX_STD_IMPL::enable_if_t<(std::is_arithmetic<T>::value || std::is_enum<T>::value) && sizeof(T) == 1, bool> = true >
+constexpr bit_bound get_bit_bound() { return bit_bound::bb_8_bits; }
+
+/**
+ * @brief
+ * Primitive type/enum get_bit_bound function.
+ *
+ * Returns the bitbound for primitives/enums with size 2.
+ * This function will be specialized for all enums with a manually defined bit_bound.
+ *
+ * @return bb_16_bits always.
+ */
+template<typename T, DDSCXX_STD_IMPL::enable_if_t<(std::is_arithmetic<T>::value || std::is_enum<T>::value) && sizeof(T) == 2, bool> = true >
+constexpr bit_bound get_bit_bound() { return bit_bound::bb_16_bits; }
+
+/**
+ * @brief
+ * Primitive type/enum get_bit_bound function.
+ *
+ * Returns the bitbound for primitives/enums with size 4.
+ * This function will be specialized for all enums with a manually defined bit_bound.
+ *
+ * @return bb_32_bits always.
+ */
+template<typename T, DDSCXX_STD_IMPL::enable_if_t<(std::is_arithmetic<T>::value || std::is_enum<T>::value) && sizeof(T) == 4, bool> = true >
+constexpr bit_bound get_bit_bound() { return bit_bound::bb_32_bits; }
+
+
+/**
+ * @brief
+ * Primitive type/enum get_bit_bound function.
+ *
+ * Returns the bitbound for primitives/enums with size 8.
+ * This function will be specialized for all enums with a manually defined bit_bound.
+ *
+ * @return bb_64_bits always.
+ */
+template<typename T, DDSCXX_STD_IMPL::enable_if_t<(std::is_arithmetic<T>::value || std::is_enum<T>::value) && sizeof(T) == 8, bool> = true >
+constexpr bit_bound get_bit_bound() { return bit_bound::bb_64_bits; }
 
 typedef struct entity_properties entity_properties_t;
 typedef std::vector<entity_properties_t> propvec;
@@ -132,7 +173,7 @@ struct OMG_DDS_API entity_properties
     uint32_t _depth = 0,
     uint32_t _m_id = 0,
     bool _is_optional = false,
-    bit_bound _bb = bb_unset,
+    bit_bound _bb = bit_bound::bb_unset,
     extensibility _ext = extensibility::ext_final,
     bool _must_understand = true):
       e_ext(_ext),
@@ -153,12 +194,18 @@ struct OMG_DDS_API entity_properties
   bool ignore = false;                            /**< Indicates that this field must be ignored.*/
   bool is_optional = false;                       /**< Indicates that this field can be empty (length 0) for reading/writing purposes.*/
   bool is_key = false;                            /**< Indicates that this field is a key field.*/
-  bit_bound e_bb = bb_unset;                      /**< The minimum number of bytes necessary to represent this entity/bitmask.*/
+  bit_bound e_bb = bit_bound::bb_unset;           /**< The minimum number of bytes necessary to represent this entity/bitmask.*/
 
-  entity_properties_t  *next_on_level = nullptr,  /**< Pointer to the next entity on the same level.*/
-                       *prev_on_level = nullptr,  /**< Pointer to the previous entity on the same level.*/
-                       *parent        = nullptr,  /**< Pointer to the parent of this entity.*/
-                       *first_member  = nullptr;  /**< Pointer to the first entity which is a member of this entity.*/
+  entity_properties_t  *parent              = nullptr,  /**< Pointer to the parent of this entity.*/
+                       *first_member        = nullptr,  /**< Pointer to the first entity which is a member of this entity.*/
+                       *next_on_level       = nullptr,  /**< Pointer to the next entity on the same level.*/
+                       *prev_on_level       = nullptr,  /**< Pointer to the previous entity on the same level.*/
+                       *first_unsorted_key  = nullptr,  /**< Pointer to the first entity which is a key member of this entity, going by declaration order.*/
+                       *next_unsorted_key   = nullptr,  /**< Pointer to the next entity which is a key member on the same level, going by declaration order.*/
+                       *prev_unsorted_key   = nullptr,  /**< Pointer to the previous entity which is a key member on the same level, going by declaration order.*/
+                       *first_sorted_key    = nullptr,  /**< Pointer to the first entity which is a key member of this entity, going by member id order.*/
+                       *next_sorted_key     = nullptr,  /**< Pointer to the next entity which is a key member on the same level, going by member id order.*/
+                       *prev_sorted_key     = nullptr;  /**< Pointer to the previous entity which is a key member on the same level, going by member id order.*/
 
   /**
    * @brief
@@ -167,18 +214,6 @@ struct OMG_DDS_API entity_properties
    * This function write the contents (id, is_key, is_optional, must_understand, xtypes_necessary) of this entity to std::cout.
    */
   void print() const;
-
-  /**
-   * @brief
-   * Checks whether this entity is not keyless.
-   *
-   * This function will check all members (if any) and if any of them has the is_key flag set, this will return true.
-   * If none have this flag set, it will return false.
-   * Used in the finish function to finish the entire entity_properties_t tree.
-   *
-   * @return true if any of the members have a key, false otherwise.
-   */
-  bool has_keys() const;
 
   /**
    * @brief
@@ -233,6 +268,51 @@ struct OMG_DDS_API entity_properties
    * @param[in] in The tree to print.
    */
   static void print(const propvec &in);
+
+  /**
+    * @brief
+    * Returns the previous entity at the current level (if any).
+    *
+    * @param[in] key The key mode to get the first entity for.
+    *
+    * @return Pointer to the first entity, or nullptr if there are none.
+    */
+  const entity_properties_t* first_entity(key_mode key) const;
+
+  /**
+    * @brief
+    * Returns the next entity at the current level (if any).
+    *
+    * @param[in] key The key mode to get the next entity for.
+    *
+    * @return Pointer to the next entity, or nullptr if there are none.
+    */
+  const entity_properties_t* next_entity(key_mode key) const;
+
+  /**
+    * @brief
+    * Returns the previous entity at the current level (if any).
+    *
+    * @param[in] key The key mode to get the previous entity for.
+    *
+    * @return Pointer to the previous entity, or nullptr if there are none.
+    */
+  const entity_properties_t* previous_entity(key_mode key) const;
+
+private:
+
+  /**
+   * @brief
+   * Checks whether this entity is not keyless.
+   *
+   * This function will check all members (if any) and if any of them has the is_key flag set, this will return true.
+   * This function is called BEFORE the total key calculation is done, so looking at the pointers to key members does not work yet.
+   * If none have this flag set, it will return false.
+   * Used in the finish function to finish the entire entity_properties_t tree.
+   *
+   * @return true if any of the members have a key, false otherwise.
+   */
+  bool has_keys() const;
 };
 
 /**

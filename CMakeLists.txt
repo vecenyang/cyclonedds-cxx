@@ -15,33 +15,6 @@ project(CycloneDDS-CXX VERSION 0.11.0 LANGUAGES C CXX)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/Modules")
 set(CMAKE_CXX_STANDARD 11)
 
-# Conan
-if(EXISTS "${CMAKE_BINARY_DIR}/conanbuildinfo.cmake" AND NOT CONAN_DEPENDENCIES)
-  include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-  if(APPLE)
-    # By default Conan strips all RPATHs (see conanbuildinfo.cmake), which
-    # causes tests to fail as the executables cannot find the library target.
-    # By setting KEEP_RPATHS, Conan does not set CMAKE_SKIP_RPATH and the
-    # resulting binaries still have the RPATH information. This is fine because
-    # CMake will strip the build RPATH information in the install step.
-    #
-    # NOTE:
-    # Conan's default approach is to use the "imports" feature, which copies
-    # all the dependencies into the bin directory. Of course, this doesn't work
-    # quite that well for libraries generated in this Project (see Conan
-    # documentation).
-    #
-    # See the links below for more information.
-    # https://github.com/conan-io/conan/issues/337
-    # https://docs.conan.io/en/latest/howtos/manage_shared_libraries/rpaths.html
-    # https://gitlab.kitware.com/cmake/community/wikis/doc/cmake/RPATH-handling
-    conan_basic_setup(KEEP_RPATHS)
-  else()
-    conan_basic_setup()
-  endif()
-  conan_define_targets()
-endif()
-
 # By default don't treat warnings as errors, else anyone building it with a
 # different compiler that just happens to generate a warning, as well as
 # anyone adding or modifying something and making a small mistake would run
@@ -172,11 +145,13 @@ set(SANITIZER "" CACHE STRING "Sanitizers to enable on the build.")
 if(SANITIZER)
   string(REGEX REPLACE " " "" SANITIZER "${SANITIZER}")
   string(REGEX REPLACE "[,;]+" ";" SANITIZER "${SANITIZER}")
-  add_compile_options("-fno-sanitize-recover=all")
   foreach(san ${SANITIZER})
     if(san STREQUAL "address")
       add_compile_options("-fno-omit-frame-pointer")
       add_link_options("-fno-omit-frame-pointer")
+    endif()
+    if(san STREQUAL "undefined")
+      add_compile_options("-fno-sanitize-recover=all")
     endif()
     if(san AND NOT san STREQUAL "none")
       message(STATUS "Enabling sanitizer: ${san}")
@@ -269,15 +244,15 @@ elseif(cyclonedds_has_shm)
   message(FATAL_ERROR "Cyclone DDS is compiled with support for shared memory")
 endif()
 
-get_target_property(cyclonedds_has_type_discovery CycloneDDS::ddsc TYPE_DISCOVERY_IS_AVAILABLE)
-mark_as_advanced(cyclonedds_has_type_discovery)
-option(ENABLE_TYPE_DISCOVERY "Enable Type Discovery support" ${cyclonedds_has_type_discovery})
-if(ENABLE_TYPE_DISCOVERY)
-  if (NOT cyclonedds_has_type_discovery)
-    message(FATAL_ERROR "Cyclone DDS is not compiled with type discovery enabled")
+get_target_property(cyclonedds_has_typelib CycloneDDS::ddsc TYPELIB_IS_AVAILABLE)
+mark_as_advanced(cyclonedds_has_typelib)
+option(ENABLE_TYPELIB "Enable Type Library support" ${cyclonedds_has_typelib})
+if(ENABLE_TYPELIB)
+  if (NOT cyclonedds_has_typelib)
+    message(FATAL_ERROR "Cyclone DDS is not compiled with type library enabled")
   endif()
-  message(STATUS "Compiling with type discovery support")
-  set(DDSCXX_HAS_TYPE_DISCOVERY "1")
+  message(STATUS "Compiling with type library support")
+  set(DDSCXX_HAS_TYPELIB "1")
 endif()
 
 get_target_property(cyclonedds_has_topic_discovery CycloneDDS::ddsc TOPIC_DISCOVERY_IS_AVAILABLE)
@@ -287,8 +262,8 @@ if(ENABLE_TOPIC_DISCOVERY)
   if (NOT cyclonedds_has_topic_discovery)
     message(FATAL_ERROR "Cyclone DDS is not compiled with topic discovery enabled")
   endif()
-  if(NOT ENABLE_TYPE_DISCOVERY)
-    message(FATAL_ERROR "ENABLE_TOPIC_DISCOVERY requires ENABLE_TYPE_DISCOVERY to be enabled")
+  if(NOT ENABLE_TYPELIB)
+    message(FATAL_ERROR "ENABLE_TOPIC_DISCOVERY requires ENABLE_TYPELIB to be enabled")
   endif()
   message(STATUS "Compiling with topic discovery support")
   set(DDSCXX_HAS_TOPIC_DISCOVERY "1")

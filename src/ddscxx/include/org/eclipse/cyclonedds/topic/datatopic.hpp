@@ -48,10 +48,11 @@ using org::eclipse::cyclonedds::core::cdr::xcdr_v1_stream;
 using org::eclipse::cyclonedds::core::cdr::xcdr_v2_stream;
 using org::eclipse::cyclonedds::core::cdr::extensibility;
 using org::eclipse::cyclonedds::core::cdr::encoding_version;
+using org::eclipse::cyclonedds::core::cdr::key_mode;
 using org::eclipse::cyclonedds::topic::TopicTraits;
 
-template<typename T, class S>
-bool get_serialized_size(const T& sample, bool as_key, size_t &sz);
+template<typename T, class S, key_mode K>
+bool get_serialized_size(const T& sample, size_t &sz);
 
 template<typename T>
 bool to_key(const T& tokey, ddsi_keyhash_t& hash)
@@ -64,7 +65,7 @@ bool to_key(const T& tokey, ddsi_keyhash_t& hash)
   {
     basic_cdr_stream str(endianness::big_endian);
     size_t sz = 0;
-    if (!get_serialized_size<T, basic_cdr_stream>(tokey, true, sz)) {
+    if (!get_serialized_size<T, basic_cdr_stream, key_mode::sorted>(tokey, sz)) {
       assert(false);
       return false;
     }
@@ -75,14 +76,17 @@ bool to_key(const T& tokey, ddsi_keyhash_t& hash)
     if (padding)
       memset(buffer.data() + sz, 0x0, padding);
     str.set_buffer(buffer.data(), sz);
-    if (!write(str, tokey, true)) {
+    if (!write(str, tokey, key_mode::sorted)) {
       assert(false);
       return false;
     }
     static thread_local bool (*fptr)(const std::vector<unsigned char>&, ddsi_keyhash_t&) = NULL;
     if (fptr == NULL)
     {
-      max(str, tokey, true);
+      if (!max(str, tokey, key_mode::sorted)) {
+        assert(false);
+        return false;
+      }
       if (str.position() <= 16)
       {
         //bind to unmodified function which just copies buffer into the keyhash
@@ -263,7 +267,7 @@ bool read_header(const void *buffer, encoding_version &ver, endianness &end)
   return true;
 }
 
-template<typename T, class S, bool K>
+template<typename T, class S, key_mode K>
 bool get_serialized_fixed_size(const T& sample, size_t &sz)
 {
   static thread_local size_t serialized_size = 0;
@@ -287,16 +291,15 @@ bool get_serialized_fixed_size(const T& sample, size_t &sz)
   return true;
 }
 
-template<typename T, class S>
-bool get_serialized_size(const T& sample, bool as_key, size_t &sz)
+template<typename T, class S, key_mode K>
+bool get_serialized_size(const T& sample, size_t &sz)
 {
   if (TopicTraits<T>::isSelfContained()) {
-    if ((as_key && !get_serialized_fixed_size<T,S,true>(sample, sz)) ||
-        (!as_key && !get_serialized_fixed_size<T,S,false>(sample, sz)))
+    if (!get_serialized_fixed_size<T,S,K>(sample,sz))
       return false;
   } else {
     S str;
-    if (!move(str, sample, as_key))
+    if (!move(str, sample, K))
       return false;
     sz = str.position();
   }
@@ -308,7 +311,7 @@ template<typename T, class S>
 bool serialize_into(void *buffer,
                     size_t buf_sz,
                     const T &sample,
-                    bool as_key)
+                    key_mode mode)
 {
   CHECK_FOR_NULL(buffer);
   assert(buf_sz >= CDR_HEADER_SIZE);
@@ -316,7 +319,7 @@ bool serialize_into(void *buffer,
   S str;
   str.set_buffer(calc_offset(buffer, CDR_HEADER_SIZE), buf_sz-CDR_HEADER_SIZE);
   return (write_header<T,S>(buffer)
-        && write(str, sample, as_key)
+        && write(str, sample, mode)
         && finish_header<T>(buffer, buf_sz));
 }
 
@@ -341,26 +344,27 @@ bool deserialize_sample_from_buffer(void *buffer,
   if (!read_header<T>(buffer, ver, end))
     return false;
 
+  const bool k = (data_kind == SDK_KEY);
   switch (ver) {
     case encoding_version::basic_cdr:
       {
         basic_cdr_stream str(end);
         str.set_buffer(calc_offset(buffer, CDR_HEADER_SIZE), buf_sz-CDR_HEADER_SIZE);
-        return read(str, sample, data_kind == SDK_KEY);
+        return read(str, sample, k ? key_mode::unsorted : key_mode::not_key);
       }
       break;
     case encoding_version::xcdr_v1:
       {
         xcdr_v1_stream str(end);
         str.set_buffer(calc_offset(buffer, CDR_HEADER_SIZE), buf_sz-CDR_HEADER_SIZE);
-        return read(str, sample, data_kind == SDK_KEY);
+        return read(str, sample, k ? key_mode::unsorted : key_mode::not_key);
       }
       break;
     case encoding_version::xcdr_v2:
       {
         xcdr_v2_stream str(end);
         str.set_buffer(calc_offset(buffer, CDR_HEADER_SIZE), buf_sz-CDR_HEADER_SIZE);
-        return read(str, sample, data_kind == SDK_KEY);
+        return read(str, sample, k ? key_mode::unsorted : key_mode::not_key);
       }
       break;
     default:
@@ -467,14 +471,16 @@ ddsi_serdata *serdata_from_sample(
   auto d = new ddscxx_serdata<T>(typecmn, kind);
   const auto& msg = *static_cast<const T*>(sample);
   size_t sz = 0;
+  const bool k = (kind == SDK_KEY);
 
-  if (!get_serialized_size<T,S>(msg, kind == SDK_KEY, sz))
+  if ((k && !get_serialized_size<T,S,key_mode::unsorted>(msg, sz)) ||
+      (!k && !get_serialized_size<T,S,key_mode::not_key>(msg, sz)))
     goto failure;
 
   sz += CDR_HEADER_SIZE;
   d->resize(sz);
 
-  if (!serialize_into<T,S>(d->data(), sz, msg, kind == SDK_KEY))
+  if (!serialize_into<T,S>(d->data(), sz, msg, k ? key_mode::unsorted : key_mode::not_key))
     goto failure;
 
   d->key_md5_hashed() = to_key(msg, d->key());
@@ -547,13 +553,13 @@ ddsi_serdata *serdata_to_untyped(const ddsi_serdata* dcmn)
 
   auto t = d->getT();
   size_t sz = 0;
-  if (t == nullptr || !get_serialized_size<T,S>(*t, true, sz))
+  if (t == nullptr || !get_serialized_size<T,S,key_mode::unsorted>(*t, sz))
     goto failure;
 
   sz += CDR_HEADER_SIZE;
   d1->resize(sz);
 
-  if (!serialize_into<T,S>(d1->data(), sz, *t, true))
+  if (!serialize_into<T,S>(d1->data(), sz, *t, key_mode::unsorted))
     goto failure;
 
   d1->key_md5_hashed() = to_key(*t, d1->key());
@@ -951,7 +957,7 @@ size_t sertype_get_serialized_size(const ddsi_sertype*, const void * sample)
 
   // get the serialized size of the sample (with out serializing)
   size_t sz = 0;
-  if (!get_serialized_size<T,S>(msg, false, sz)) {
+  if (!get_serialized_size<T,S,key_mode::not_key>(msg, sz)) {
     // the max value is treated as an error in the Cyclone core
     return SIZE_MAX;
   }
@@ -968,7 +974,7 @@ bool sertype_serialize_into(const ddsi_sertype*,
   // cast to the type
   const auto& msg = *static_cast<const T*>(sample);
 
-  return serialize_into<T,S>(dst_buffer, sz, msg, false);
+  return serialize_into<T,S>(dst_buffer, sz, msg, key_mode::not_key);
 }
 
 template<typename T,
@@ -983,7 +989,7 @@ struct ddscxx_sertype_ops: public ddsi_sertype_ops {
   sertype_free_samples<T>,
   sertype_equal<T>,
   sertype_hash<T>,
-  #ifdef DDSCXX_HAS_TYPE_DISCOVERY
+  #ifdef DDSCXX_HAS_TYPELIB
   TopicTraits<T>::getTypeId,
   TopicTraits<T>::getTypeMap,
   TopicTraits<T>::getTypeInfo,
@@ -991,7 +997,7 @@ struct ddscxx_sertype_ops: public ddsi_sertype_ops {
   nullptr,
   nullptr,
   nullptr,
-  #endif //DDSCXX_HAS_TYPE_DISCOVERY
+  #endif //DDSCXX_HAS_TYPELIB
   TopicTraits<T>::deriveSertype,
   sertype_get_serialized_size<T,S>,
   sertype_serialize_into<T,S>
