@@ -563,7 +563,7 @@ bool is_selfcontained(const void *node)
 {
   if (idl_is_sequence(node)
    || idl_is_string(node)
-   || idl_is_optional(node)) {
+   || is_optional(node)) {
     return false;
   } else if (idl_is_typedef(node)) {
     return is_selfcontained(((const idl_typedef_t*)node)->type_spec);
@@ -861,8 +861,9 @@ generate_includes(const idl_pstate_t *pstate, struct generator *generator)
   }
 
   { int len = 0;
-    const char *incs[11];
+    const char *incs[12];
     incs[len++] = "<utility>";
+    incs[len++] = "<ostream>";
 
     if (generator->uses_integers)
       incs[len++] = "<cstdint>";
@@ -897,6 +898,16 @@ generate_includes(const idl_pstate_t *pstate, struct generator *generator)
 
   if (fputs("\n", generator->header.handle) < 0)
     return IDL_RETCODE_NO_MEMORY;
+
+  if (generator->uses_array || generator->uses_sequence || generator->uses_bounded_sequence || generator->uses_optional)
+  {
+    // ostream cpp
+    // streaming operators for the used std types
+    const char *fmt;
+    fmt = "#include <org/eclipse/cyclonedds/util/ostream_operators.hpp>\n\n";
+    if (fputs(fmt, generator->impl.handle) < 0)
+      return IDL_RETCODE_NO_MEMORY;
+  }
 
   return IDL_RETCODE_OK;
 }

@@ -11,6 +11,7 @@
 #ifndef DDSCXXDATATOPIC_HPP_
 #define DDSCXXDATATOPIC_HPP_
 
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <cstring>
@@ -623,10 +624,24 @@ size_t serdata_print(
 {
   (void)tpcmn;
   (void)dcmn;
-  //implementation to follow!!!
-  if (bufsize > 0)
-    buf[0] = 0x0;
-  return 0;
+
+  size_t copy_len = 0;
+  auto d = const_cast<ddscxx_serdata<T>*>(static_cast<const ddscxx_serdata<T>*>(dcmn));
+  auto t_ptr = d->getT();
+
+  if (t_ptr) {
+    std::stringstream ss;
+    ss << *t_ptr;
+
+    const std::string data = ss.str();
+    const size_t len = data.size();
+    copy_len = len < bufsize ? len : bufsize;
+
+    std::copy_n(data.c_str(), copy_len, buf);
+    buf[len < bufsize ? copy_len : copy_len - 1] = '\0';
+  }
+
+  return copy_len;
 }
 
 template <typename T>

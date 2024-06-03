@@ -189,7 +189,7 @@ if(ENABLE_LEGACY)
   set(cyclonedds_cpp_std_to_use 11)
   set(DDSCXX_USE_BOOST "1")
   find_package(Boost)
-  include_directories(${Boost_INCLUDE_DIR})
+  include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 endif()
 
 include(CMakePackageConfigHelpers)
@@ -250,6 +250,19 @@ if(ENABLE_TOPIC_DISCOVERY)
   message(STATUS "Compiling with topic discovery support")
   set(DDSCXX_HAS_TOPIC_DISCOVERY "1")
 endif()
+
+get_target_property(cyclonedds_has_qos_provider CycloneDDS::ddsc QOS_PROVIDER_IS_AVAILABLE)
+mark_as_advanced(cyclonedds_has_qos_provider)
+option(ENABLE_QOS_PROVIDER "Enable QoS Provider support" ${cyclonedds_has_qos_provider})
+if(ENABLE_QOS_PROVIDER)
+  if (NOT cyclonedds_has_qos_provider)
+    message(FATAL_ERROR "Cyclone DDS is not compiled with qos provider enabled")
+  endif()
+  message(STATUS "Compiling with qos provider support")
+  set(DDSCXX_HAS_QOS_PROVIDER "1")
+endif()
+
+
 
 configure_file(features.hpp.in "${CMAKE_CURRENT_BINARY_DIR}/src/ddscxx/include/dds/features.hpp")
 
